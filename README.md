@@ -21,15 +21,14 @@
 2. Download kernel
    ```
    git clone https://github.com/clovadevice/friends.git
-
    ```
 
 2. Build
    ```
- cd kernel
- make ARCH=arm if_s300n_defconfig
- make mrproper
- make bootimage   
+   cd kernel
+   make ARCH=arm if_s300n_defconfig
+   make mrproper
+   make bootimage   
    ```
 
 # License
