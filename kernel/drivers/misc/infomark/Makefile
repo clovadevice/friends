@@ -1,0 +1,6 @@
+
+obj-$(CONFIG_INFOMARK_LED_ANIMATION)	+= ledanim.o 
+obj-$(CONFIG_IS3236A_LED_DRIVER)	+= is3236.o
+obj-$(CONFIG_IS3737_LED_DRIVER)		+= is3737.o
+obj-$(CONFIG_INFOMARK_GPIO_LED_DRIVER)	+= gpio-led.o
+

@@ -1,0 +1,12 @@
+
+menuconfig SND_SOC_TAS2559
+	tristate "Texas Instruments TAS2559 SmartAmp(R)"
+
+if SND_SOC_TAS2559
+config TAS2559_CODEC
+    bool "Codec Driver support"
+
+config TAS2559_MISC
+    bool "Misc Driver support"
+	
+endif # SND_SOC_TAS2559
