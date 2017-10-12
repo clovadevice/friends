@@ -18,12 +18,12 @@
    repo init -u git://codeaurora.org/platform/manifest.git -b release -m LA.BR.1.2.9-02310-8x09.0.xml --repo-url=git://codeaurora.org/tools/repo.git
    ```
 
-2. Download kernel
+2. Download the kernel
    ```
    git clone https://github.com/clovadevice/friends.git
    ```
 
-2. Build
+3. Build
    ```
    cd kernel
    make ARCH=arm if_s300n_defconfig
