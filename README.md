@@ -1,4 +1,4 @@
-# FRIENES Opensource 
+# FRIENDS Opensource 
 
 # How to build
 
