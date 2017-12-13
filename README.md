@@ -3,7 +3,7 @@
 # How to build
 
 0. Setup build environment
-   - please refer to https://source.android.com/source/initializing for the build environment
+   - please refer to https://source.android.com/source/initializing for the build environment.
    - setup repo
      ```
      mkdir ~/bin
@@ -32,4 +32,4 @@
    ```
 
 # License
-Please see NOTICE.html for the full open source license
+Please see licenses/NOTICE.html, licenses/NOTICE_line.txt for the full open source license.
