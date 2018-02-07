@@ -5,6 +5,7 @@ THE FOLLOWING SETS FORTH ATTRIBUTION NOTICES FOR THIRD PARTY SOFTWARE THAT MAY B
 The following software may be included in this application: acra from http://code.google.com/p/acra/
 This software contains the following license and notice below:
 
+
 Application Crash Reporting for Android
 Copyright (c) 2013 Kevin Gaudin
 http://acra.ch
@@ -28,6 +29,7 @@ limitations under the License.
 The following software may be included in this application: Android Source from http://source.android.com/
 This software contains the following license and notice below:
 
+
 Copyright (C) 2006 The Android Open Source Project
 
 Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -44,27 +46,29 @@ limitations under the License.
 
 =====
 
-The following software may be included in this application: Android SDK from http://developer.android.com/sdk/index.html
+The following software may be included in this application: Android Support Library (v4) from http://developer.android.com/sdk/compatibility-library.html
 This software contains the following license and notice below:
 
-Copyright (C) 2007 The Android Open Source Project
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Copyright (C) 2006 The Android Open Source Project
 
-    http://www.apache.org/licenses/LICENSE-2.0
+Licensed under the Apache License, Version 2.0 (the "License"); 
+you may not use this file except in compliance with the License. 
+You may obtain a copy of the License at 
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
+http://www.apache.org/licenses/LICENSE-2.0 
+
+Unless required by applicable law or agreed to in writing, software 
+distributed under the License is distributed on an "AS IS" BASIS, 
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+See the License for the specific language governing permissions and 
 limitations under the License.
 
 =====
 
-The following software may be included in this application: android-cmake from https://github.com/taka-no-me/android-cmake/
+The following software may be included in this application: android-cmake from http://github.com/taka-no-me/android-cmake/
 This software contains the following license and notice below:
+
 
 Copyright (c) 2010-2011, Ethan Rublee
 Copyright (c) 2011-2014, Andrey Kamaev
@@ -101,6 +105,7 @@ POSSIBILITY OF SUCH DAMAGE.
 The following software may be included in this application: android.support.annotation from https://developer.android.com/reference/android/support/annotation/package-summary.html
 This software contains the following license and notice below:
 
+
 Copyright (C) 2006 The Android Open Source Project
 
 Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -117,29 +122,29 @@ limitations under the License.
 
 =====
 
-The following software may be included in this application: anko-sqlite from https://github.com/Kotlin/anko
+The following software may be included in this application: anko-sqlite from https://mvnrepository.com/artifact/org.jetbrains.anko/anko-sqlite/0.9-beta1
 This software contains the following license and notice below:
 
-/*
- * Copyright 2016 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
+Copyright 2016 JetBrains s.r.o.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 =====
 
-The following software may be included in this application: Apache Commons Codec from http://commons.apache.org/proper/commons-codec/
+The following software may be included in this application: Apache Commons Codec from http://repo.maven.apache.org/maven2/de/knightsoft-net/gwt-commons-codec/
 This software contains the following license and notice below:
+
 
 Apache Commons Codec
 Copyright 2002-2016 The Apache Software Foundation
@@ -181,6 +186,7 @@ Copyright (c) 2008 Alexander Beider & Stephen P. Morse.
 The following software may be included in this application: Apache Commons Lang from http://commons.apache.org/proper/commons-lang/
 This software contains the following license and notice below:
 
+
 Apache Commons Lang
 Copyright 2001-2016 The Apache Software Foundation
 
@@ -204,8 +210,9 @@ limitations under the License.
 
 =====
 
-The following software may be included in this application: Apache HttpComponents Client from http://hc.apache.org/httpcomponents-client-ga/index.html
+The following software may be included in this application: Apache HttpClient from https://repo1.maven.org/maven2/org/apache/httpcomponents/httpclient/
 This software contains the following license and notice below:
+
 
 Apache HttpComponents Client
 Copyright 1999-2017 The Apache Software Foundation
@@ -232,8 +239,206 @@ See http://www.jcip.net and the Creative Commons Attribution License
 
 =====
 
-The following software may be included in this application: Apache Thrift from http://thrift.apache.org/
+The following software may be included in this application: Apache HttpClient Cache from http://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpclient-cache/
 This software contains the following license and notice below:
+
+
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+ 
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+This software consists of voluntary contributions made by many
+individuals on behalf of the Apache Software Foundation.  For more
+information on the Apache Software Foundation, please see
+<http://www.apache.org />.
+
+=====
+
+The following software may be included in this application: Apache HttpClient Fluent API from http://repo.maven.apache.org/maven2/org/apache/httpcomponents/fluent-hc/
+This software contains the following license and notice below:
+
+
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+ 
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+This software consists of voluntary contributions made by many
+individuals on behalf of the Apache Software Foundation.  For more
+information on the Apache Software Foundation, please see
+<http://www.apache.org />.
+
+=====
+
+The following software may be included in this application: Apache HttpClient Mime from http://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpmime/
+This software contains the following license and notice below:
+
+
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+ 
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+This software consists of voluntary contributions made by many
+individuals on behalf of the Apache Software Foundation.  For more
+information on the Apache Software Foundation, please see
+<http://www.apache.org />.
+
+=====
+
+The following software may be included in this application: Apache HttpClient OSGi bundle from http://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpclient-osgi/
+This software contains the following license and notice below:
+
+
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+ 
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+This software consists of voluntary contributions made by many
+individuals on behalf of the Apache Software Foundation.  For more
+information on the Apache Software Foundation, please see
+<http://www.apache.org />.
+
+=====
+
+The following software may be included in this application: Apache HttpClient Windows features from http://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpclient-win/
+This software contains the following license and notice below:
+
+
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+ 
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+This software consists of voluntary contributions made by many
+individuals on behalf of the Apache Software Foundation.  For more
+information on the Apache Software Foundation, please see
+<http://www.apache.org />.
+
+=====
+
+The following software may be included in this application: Apache HttpComponents Client from http://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpcomponents-client/
+This software contains the following license and notice below:
+
+
+Apache HttpComponents Client
+Copyright 1999-2017 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+This project contains annotations derived from JCIP-ANNOTATIONS
+Copyright (c) 2005 Brian Goetz and Tim Peierls.
+See http://www.jcip.net and the Creative Commons Attribution License
+(http://creativecommons.org/licenses/by/2.5)
+
+=====
+
+The following software may be included in this application: Apache HttpComponents Core from http://hc.apache.org/httpcomponents-core-ga
+This software contains the following license and notice below:
+
+
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+ 
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+
+This software consists of voluntary contributions made by many
+individuals on behalf of the Apache Software Foundation.  For more
+information on the Apache Software Foundation, please see
+<http://www.apache.org />.
+
+=====
+
+The following software may be included in this application: Apache Thrift from http://github.com/apache/thrift/
+This software contains the following license and notice below:
+
 
 Copyright 2006-2010 The Apache Software Foundation.
 
@@ -251,8 +456,9 @@ limitations under the License.
 
 =====
 
-The following software may be included in this application: Apache Tomcat from https://github.com/apache/tomcat
+The following software may be included in this application: Apache Tomcat from http://jakarta.apache.org/tomcat/index.html
 This software contains the following license and notice below:
+
 
 /*
  *  Licensed to the Apache Software Foundation (ASF) under one or more
@@ -329,8 +535,9 @@ http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html
 
 =====
 
-The following software may be included in this application: bcprov-jdk16 from http://www.bouncycastle.org/java.html
+The following software may be included in this application: bcprov-jdk16 from https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk16/1.46
 This software contains the following license and notice below:
+
 
 Copyright (c) 2000 - 2017 The Legion of the Bouncy Castle Inc.
 (https://www.bouncycastle.org)
@@ -356,6 +563,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 The following software may be included in this application: BoringSSL from https://boringssl.googlesource.com/boringssl/
 This software contains the following license and notice below:
+
 
 BoringSSL is a fork of OpenSSL. As such, large parts of it fall under OpenSSL
 licensing. Files that are completely new have a Google copyright and an ISC
@@ -556,10 +764,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+
 =====
 
-The following software may be included in this application: Apache Commons IO from http://commons.apache.org/proper/commons-io/
+The following software may be included in this application: Commons IO from https://maven.repository.redhat.com/ga/commons-io/commons-io/
 This software contains the following license and notice below:
+
 
 Apache Commons IO
 Copyright 2002-2016 The Apache Software Foundation
@@ -579,10 +789,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
 =====
 
 The following software may be included in this application: cryptography from http://github.com/pyca/cryptography/
 This software contains the following license and notice below:
+
 
 Copyright (c) Individual contributors.
 All rights reserved.
@@ -614,8 +826,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =====
 
-The following software may be included in this application: curve25519-java from https://code.google.com/archive/p/curve25519-java/
+The following software may be included in this application: curve25519-java from http://code.google.com/p/curve25519-java/
 This software contains the following license and notice below:
+
 
 /* Ported from C to Java by Dmitry Skiba [sahn0], 23/02/08.
  * Original: http://cds.xs4all.nl:8081/ecdh/
@@ -629,8 +842,9 @@ This software contains the following license and notice below:
 
 =====
 
-The following software may be included in this application: dnsjava/dnsjava from http://dnsjava.org
+The following software may be included in this application: dnsjava from http://repo.maven.apache.org/maven2/dnsjava/dnsjava/
 This software contains the following license and notice below:
+
 
 dnsjava is placed under the BSD license.  Several files are also under
 additional licenses; see the individual files for details.
@@ -663,10 +877,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =====
 
-The following software may be included in this application: google/gson from https://github.com/google/gson
+The following software may be included in this application: google-gson from http://code.google.com/p/google-gson/
 This software contains the following license and notice below:
 
-Copyright 2008 Google Inc. 
+
+Copyright 2008 Google Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -682,8 +897,37 @@ limitations under the License.
 
 =====
 
-The following software may be included in this application: JSON-java from https://github.com/stleary/JSON-java
+The following software may be included in this application: Hugo Annotations from http://repo.maven.apache.org/maven2/com/jakewharton/hugo/hugo-annotations/
 This software contains the following license and notice below:
+
+
+Copyright 2013 Jake Wharton
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=====
+
+The following software may be included in this application: IntelliJ IDEA Annotations - org.jetbrains:annotations from http://www.jetbrains.org
+This software contains the following license and notice below:
+
+
+######################################################################
+
+=====
+
+The following software may be included in this application: JSON in Java from http://central.maven.org/maven2/org/json/json/
+This software contains the following license and notice below:
+
 
 Copyright (c) 2002 JSON.org
 
@@ -709,8 +953,9 @@ SOFTWARE.
 
 =====
 
-The following software may be included in this application: Kotlin Stdlib from https://kotlinlang.org/
+The following software may be included in this application: Kotlin Stdlib from https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
 This software contains the following license and notice below:
+
 
 /*
  * Copyright 2010-2017 JetBrains s.r.o.
@@ -730,8 +975,9 @@ This software contains the following license and notice below:
 
 =====
 
-The following software may be included in this application: kotlin-reflect from https://kotlinlang.org/
+The following software may be included in this application: kotlin-reflect from https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
 This software contains the following license and notice below:
+
 
 /*
  * Copyright 2010-2017 JetBrains s.r.o.
@@ -751,8 +997,9 @@ This software contains the following license and notice below:
 
 =====
 
-The following software may be included in this application: LZ4 Library from https://github.com/lz4/lz4
+The following software may be included in this application: lz4 Compression algorithm from http://github.com/Cyan4973/lz4/
 This software contains the following license and notice below:
+
 
 LZ4 Library
 Copyright (c) 2011-2016, Yann Collet
@@ -781,7 +1028,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =====
 
-The following software may be included in this application: openssl/openssl from http://www.openssl.org/
+The following software may be included in this application: OpenSSL from http://www.openssl.org
 This software contains the following license and notice below:
 
 
@@ -909,10 +1156,12 @@ This software contains the following license and notice below:
  * [including the GNU Public Licence.]
  */
 
+
 =====
 
-The following software may be included in this application: ReactiveX/RxAndroid from https://github.com/ReactiveX/RxAndroid
+The following software may be included in this application: rxandroid from http://repo.maven.apache.org/maven2/io/reactivex/rxandroid/
 This software contains the following license and notice below:
+
 
 Copyright 2015 The RxAndroid authors
 
@@ -928,10 +1177,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
 =====
 
-The following software may be included in this application: ReactiveX/RxJava from https://github.com/ReactiveX/RxJava
+The following software may be included in this application: RxJava from http://github.com/Netflix/RxJava/
 This software contains the following license and notice below:
+
 
 Copyright (c) 2016-present, RxJava Contributors.
 
@@ -943,8 +1194,9 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 =====
 
-The following software may be included in this application: square/tape from https://github.com/square/tape
+The following software may be included in this application: Tape from https://github.com/square/tape
 This software contains the following license and notice below:
+
 
 Copyright 2012 Square, Inc.
 
@@ -959,6 +1211,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
 
 =====
 
@@ -1167,83 +1420,65 @@ This software contains the following license and notice below:
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
- 
+
+
 =====
 
-The following software may be included in this application: getopt from https://www.freebsd.org/
+The following software may be included in this application: WebRTC from https://sites.google.com/site/webrtc/
 This software contains the following license and notice below:
 
-Copyright 1992-2016 The FreeBSD Project. All rights reserved.
+
+Copyright (c) 2011, The WebRTC project authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+  * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the
+    distribution.
+
+  * Neither the name of Google nor the names of its contributors may
+    be used to endorse or promote products derived from this software
+    without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=====
+
+The following software may be included in this application: livspeex from http://www.speex.org/
+This software contains the following license and notice below:
+
+
+© 2002-2003, Jean-Marc Valin/Xiph.Org Foundation
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+- Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+- Neither the name of the Xiph.org Foundation nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
-The views and conclusions contained in the software and documentation are those of the authors and should not be interpreted as representing official policies, either expressed or implied, of the FreeBSD Project.
-
-=====
-
-The following software may be included in this application: chacha20 from http://chacha20.insanecoding.org/
-This software contains the following license and notice below:
-
-/*
-Copyright (C) 2014 insane coder (http://insanecoding.blogspot.com/, http://chacha20.insanecoding.org/)
-
-Permission to use, copy, modify, and distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-This implementation is intended to be simple, many optimizations can be performed.
-*/
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.     
 
 =====
 
-The following software may be included in this application: Jansson from http://www.digip.org/jansson/
+The following software may be included in this application: libvpx(vp8) from http://www.webmproject.org/code/
 This software contains the following license and notice below:
 
-Copyright (c) 2009-2014 Petri Lehtinen <petri@digip.org>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-=====
-
-The following software may be included in this application: libtom/libtomcrypt from https://github.com/libtom/libtomcrypt
-This software contains the following license and notice below:
-
-LibTomCrypt is public domain.  As should all quality software be.
-
-Tom St Denis
-
-=====
-
-The following software may be included in this application: libvpx from http://www.webmproject.org
-This software contains the following license and notice below:
 
 Copyright (c) 2010, Google Inc. All rights reserved.
 
@@ -1259,8 +1494,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 =====
 
-The following software may be included in this application: libyuv from http://code.google.com/p/libyuv
+The following software may be included in this application: libyuv from https://code.google.com/p/libyuv/
 This software contains the following license and notice below:
+
 
 Copyright 2011 The LibYuv Project Authors. All rights reserved.
 
@@ -1294,8 +1530,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =====
 
-The following software may be included in this application: plausiblelabs/plcrashreporter from https://github.com/plausiblelabs/plcrashreporter
+The following software may be included in this application: PLCrashReporter from http://code.google.com/p/plcrashreporter/
 This software contains the following license and notice below:
+
 
 Except as noted below, PLCrashReporter is provided under the
 following license:
@@ -1353,8 +1590,9 @@ file are licensed as follows:
 
 =====
 
-The following software may be included in this application: OPUS from http://opus-codec.org/
+The following software may be included in this application: OPUS from http://www.opus-codec.org/
 This software contains the following license and notice below:
+
 
 Copyright 2001-2011 Xiph.Org, Skype Limited, Octasic,
                     Jean-Marc Valin, Timothy B. Terriberry,
@@ -1403,23 +1641,19 @@ https://datatracker.ietf.org/ipr/1526/
 
 =====
 
-The following software may be included in this application: Speex from https://speex.org/
+The following software may be included in this application: libtomcrypt from http://www.libtom.org/
 This software contains the following license and notice below:
 
-© 2002-2003, Jean-Marc Valin/Xiph.Org Foundation
 
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+LibTomCrypt is public domain.  As should all quality software be.
 
-- Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-- Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-- Neither the name of the Xiph.org Foundation nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Tom St Denis
 
 =====
 
-The following software may be included in this application: libtom/tomsfastmath from https://github.com/libtom/tomsfastmath
+The following software may be included in this application: tomsfastmath from http://www.libtom.org/
 This software contains the following license and notice below:
+
 
 TomsFastMath is public domain.  As should all quality software be.
 
@@ -1427,89 +1661,171 @@ Tom St Denis
 
 =====
 
-The following software may be included in this application: WebRTC from https://sites.google.com/site/webrtc/
+The following software may be included in this application: jansson from http://www.digip.org/jansson/
 This software contains the following license and notice below:
 
-Copyright (c) 2011, The WebRTC project authors. All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
+Copyright (c) 2009-2014 Petri Lehtinen <petri@digip.org>
 
-  * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-  * Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in
-    the documentation and/or other materials provided with the
-    distribution.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-  * Neither the name of Google nor the names of its contributors may
-    be used to endorse or promote products derived from this software
-    without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 =====
 
+The following software may be included in this application: chacha20 from http://chacha20.insanecoding.org
+This software contains the following license and notice below:
 
 
+Copyright (C) 2014 insane coder (http://insanecoding.blogspot.com/, http://chacha20.insanecoding.org/)
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+This implementation is intended to be simple, many optimizations can be performed.
+
+=====
+
+The following software may be included in this application: getopt from https://www.freebsd.org/
+This software contains the following license and notice below:
 
 
+Copyright 1992-2016 The FreeBSD Project. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+The views and conclusions contained in the software and documentation are those of the authors and should not be interpreted as representing official policies, either expressed or implied, of the FreeBSD Project.
+
+=====
+
+The following software may be included in this application: ACE Timer heap from http://www.cs.wustl.edu/%7Eschmidt/ACE.html
+This software contains the following license and notice below:
 
 
+Permissions have been obtained from the copyright holder/original author (Douglas C. Schmidt) to use and redistribute this code according to the SOFTWARE licenses. You may, at your option, opt to use ACE license for this particular software.
 
 
+=====
+
+The following software may be included in this application: Alaw/Ulaw Converter from https://github.com/pjsip/pjproject/blob/master/pjmedia/src/pjmedia/alaw_ulaw.c
+This software contains the following license and notice below:
 
 
+This source code is a product of Sun Microsystems, Inc. and is provided for unrestricted use.  Users may copy or modify this source code without charge.
+
+=====
+
+The following software may be included in this application: CRC32 Algorithm from https://github.com/pjsip/pjproject/blob/master/pjlib-util/src/pjlib-util/crc32.c
+This software contains the following license and notice below:
 
 
+This software is put in public domain, and can be used for any purpose with no warranty
 
 
+=====
+
+The following software may be included in this application: MD5 Hashing Algorithm from https://github.com/pjsip/pjproject/blob/master/pjlib-util/src/pjlib-util/md5.c
+This software contains the following license and notice below:
 
 
+This software is put in public domain, and can be used for any purpose with no warranty
 
 
+=====
+
+The following software may be included in this application: SHA1 Encryption from https://github.com/pjsip/pjproject/blob/master/pjlib-util/src/pjlib-util/sha1.c
+This software contains the following license and notice below:
 
 
+This software is put in public domain, and can be used for any purpose with no warranty
 
 
+=====
+
+The following software may be included in this application: Milenage and Rijndael from http://www.3gpp.org/specifications/60-confidentiality-algorithms
+This software contains the following license and notice below:
 
 
+The 3GPP authentication and key generation functions (MILENAGE) have been developed
+through the collaborative efforts of the 3GPP Organizational Partners.
+
+They may be used only for the development and operation of 3G Mobile Communications and services.
+There are no additional requirements or authorizations necessary for these algorithms to be implemented.
+
+=====
+
+The following software may be included in this application: libSRTP from https://sourceforge.net/projects/srtp/
+This software contains the following license and notice below:
 
 
+ Copyright (c) 2001-2006, Cisco Systems, Inc.
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 
+   Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+ 
+   Redistributions in binary form must reproduce the above
+   copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided
+   with the distribution.
+ 
+   Neither the name of the Cisco Systems, Inc. nor the names of its
+   contributors may be used to endorse or promote products derived
+   from this software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=====
+
+The following software may be included in this application: DirectShow Base Classes Microsoft SDK Sample from https://msdn.microsoft.com/en-us/library/windows/desktop/dd375456(v=vs.85).aspx
+This software contains the following license and notice below:
 
 
+Microsoft Windows SDK Licence (Licence.htm in Windows SDK installation directory)
+   Sample Code.  You may modify, copy, and distribute the source and object code form of code marked as “sample.”
+source code:
+ Copyright (c) 1992-2001 Microsoft Corporation.  All rights reserved.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+=====
