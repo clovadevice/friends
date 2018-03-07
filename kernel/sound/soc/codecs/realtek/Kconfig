@@ -1,0 +1,9 @@
+
+menuconfig SND_SOC_REALTEK
+	tristate "Realtek Audio Driver"
+
+config SND_SOC_RT5640
+    bool "Codec Driver support"
+
+	
+
