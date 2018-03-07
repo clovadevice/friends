@@ -15,7 +15,7 @@
 1. Get Android open source from CodeAurora and FRIENDS kernel
    - android version: 7.1.1  
    ```
-   repo init -u git://codeaurora.org/platform/manifest.git -b release -m LA.BR.1.2.9-02310-8x09.0.xml --repo-url=git://codeaurora.org/tools/repo.git
+   repo init -u git://codeaurora.org/platform/manifest.git -b release -m LA.BR.1.2.9-03910-8x09.0.xml --repo-url=git://codeaurora.org/tools/repo.git
    ```
 
 2. Download the kernel
