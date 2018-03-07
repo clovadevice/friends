@@ -26,18 +26,6 @@
 #include <linux/leds.h>
 #include <linux/debugfs.h>
 
-#if 0 // hjkoh: disable led control
-#if defined(CONFIG_INFOMARK_LED_ANIMATION)
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
-#include <linux/workqueue.h>
-extern int ledanim_set_max_current(unsigned char value);
-extern int ledanim_get_max_current(unsigned char *value);
-#define CHARGING_LED 255
-#define DISCHARGING_LED 153
-#endif
-#endif
-#endif
-
 #define CREATE_MASK(NUM_BITS, POS) \
 	((unsigned char) (((1 << (NUM_BITS)) - 1) << (POS)))
 #define LBC_MASK(MSB_BIT, LSB_BIT) \
@@ -147,7 +135,7 @@ extern int ledanim_get_max_current(unsigned char *value);
 
 #define QPNP_CHARGER_DEV_NAME	"qcom,qpnp-linear-charger"
 
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
 #define NO_USE_BATTERY_THERM
 #endif
 
@@ -428,13 +416,6 @@ struct qpnp_lbc_chip {
 	/* parallel-chg params */
 	struct power_supply		parallel_psy;
 	struct delayed_work		parallel_work;
-#if 0 // hjkoh: disable led control
-#if defined(CONFIG_INFOMARK_LED_ANIMATION)
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
-	struct work_struct	led_work;
-#endif
-#endif
-#endif
 };
 
 static void qpnp_lbc_enable_irq(struct qpnp_lbc_chip *chip,
@@ -2657,22 +2638,6 @@ static irqreturn_t qpnp_lbc_usbin_valid_irq_handler(int irq, void *_chip)
 
 	return IRQ_HANDLED;
 }
-#if 0 // hjkoh: disable led control
-#if defined(CONFIG_INFOMARK_LED_ANIMATION)
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
-static void ledanim_work(struct work_struct *work)
-{
-	struct qpnp_lbc_chip *chip = container_of(work, struct qpnp_lbc_chip, led_work);
-
-	if(chip->usb_present){
-		ledanim_set_max_current(CHARGING_LED);
-	} else {
-		ledanim_set_max_current(DISCHARGING_LED);
-	}
-}
-#endif
-#endif
-#endif
 
 static irqreturn_t qpnp_lbc_cblpwr_on_irq_handler(int irq, void *_chip)
 {
@@ -2687,13 +2652,6 @@ static irqreturn_t qpnp_lbc_cblpwr_on_irq_handler(int irq, void *_chip)
 		pr_debug("Updating usb_psy PRESENT property\n");
 		power_supply_set_present(chip->usb_psy, chip->usb_present);
 	}
-#if 0 // hjkoh: disable led control
-#if defined(CONFIG_INFOMARK_LED_ANIMATION)
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
-	schedule_work(&chip->led_work);
-#endif
-#endif
-#endif
 
 	return IRQ_HANDLED;
 }
@@ -3092,19 +3050,6 @@ static void determine_initial_external_status(struct qpnp_lbc_chip *chip)
 	if (chip->usb_present) {
 		power_supply_set_online(chip->usb_psy, 1);
 	}
-#if 0 // hjkoh: disable led control
-#if defined(CONFIG_INFOMARK_LED_ANIMATION)
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
-#if 0 // haksukim : An issue that slows booting.
-	if(chip->usb_present){
-		ledanim_set_max_current(CHARGING_LED);
-	} else {
-		ledanim_set_max_current(DISCHARGING_LED);
-	}
-#endif
-#endif
-#endif
-#endif
 }
 
 static void qpnp_lbc_collapsible_detection_work(struct work_struct *work)
@@ -3632,13 +3577,6 @@ external_charger_usb:
 #endif
 
 	determine_initial_external_status(chip);
-#if 0 // hjkoh: disable led control
-#if defined(CONFIG_INFOMARK_LED_ANIMATION)
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
-	INIT_WORK(&chip->led_work, ledanim_work);
-#endif
-#endif
-#endif
 
 	rc = qpnp_lbc_request_irqs_external(chip);
 	if (rc) {

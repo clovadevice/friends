@@ -63,6 +63,11 @@
 
 //#define MAX17048_DEBUG
 
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+// hjkoh: MAX17048 not support current. 
+#define USE_SMB_PHY_CURRENT_PROP
+#endif
+
 struct max17048_chip {
 	struct i2c_client *client;
 	struct power_supply batt_psy;
@@ -192,8 +197,12 @@ static int max17048_get_capacity_from_soc(struct max17048_chip *chip)
 	buf[0] = (chip->soc & 0x0000FF00) >> 8;
 	buf[1] = (chip->soc & 0x000000FF);
 	pr_debug("%s: SOC raw = 0x%x%x\n", __func__, buf[0], buf[1]);
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
+	batt_soc = (((int)buf[0]*256)+buf[1])*39062; // 0.00390625  18bit
+#else
 	batt_soc = (((int)buf[0]*256)+buf[1])*19531; // 0.001953125 19bit
-//	batt_soc = (((int)buf[0]*256)+buf[1])*39062; // 0.00390625  18bit
+#endif
+
 	batt_soc = (batt_soc - (chip->empty_soc * 1000000))
 			/ ((chip->full_soc - chip->empty_soc) * 10000);
 	batt_soc = bound_check(100, 0, batt_soc);
@@ -697,7 +706,7 @@ static int qpnp_get_battery_current(int *current_ua)
 #endif*/
 static int max17048_get_prop_current(struct max17048_chip *chip)
 {
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
+#if defined(USE_SMB_PHY_CURRENT_PROP)
 	union power_supply_propval ret = {0,};
 
 	if (chip->smb_psy) {

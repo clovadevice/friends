@@ -556,18 +556,18 @@ static void transmit_registers(struct tas2559_priv *pTAS2559, cfg_reg *r, int n)
             case CFG_META_BURST:
 				pTAS2559->client->addr = pTAS2559->mnDevAAddr;
 				memset(tmp_buf,0x00,BUF_MAX);
-				memcpy(tmp_buf,&(r[i+1].param),r[i].param); //wjhyun test point
-				ret = regmap_bulk_write(pTAS2559->mpRegmap,r[i+1].command,tmp_buf,r[i].param);
+				memcpy(tmp_buf,&(r[i+1].param),r[i].param-1);
+				ret = regmap_bulk_write(pTAS2559->mpRegmap,r[i+1].command,tmp_buf,r[i].param-1);
 
 				if (ret < 0)
 					printk("WON : I2C write error block\n");
 
 				#if 0
 				printk("\n+++++++++++++++++[CFG_META_BURST, reg 0x%x size %d]++++++++++++++++++++++\n",r[i+1].command,r[i].param);
-				for(k=0;k<=r[i].param;k++)
+				for(k=0;k<=r[i].param-1;k++)
 				{
 					printk("0x%x,",tmp_buf[k]);
-					if(k%10 == 0)
+					if(k%10 == 9)
 						printk("\n");
 				}
 				printk("\n-------------------------------------------------------------------------\n");
@@ -579,8 +579,8 @@ static void transmit_registers(struct tas2559_priv *pTAS2559, cfg_reg *r, int n)
 				//printk("WON : r[%d].command 0x%x r[%d].param 0x%x\n",i,r[i].command,i,r[i].param);
 				ret = regmap_write(pTAS2559->mpRegmap,r[i].command,r[i].param);
 				
-				if (ret < 0)
-					printk("WON : I2C write error\n");
+				//if (ret < 0)
+					//printk("WON : I2C write error\n");
 				
                 break;
             }
@@ -590,7 +590,7 @@ static void transmit_registers(struct tas2559_priv *pTAS2559, cfg_reg *r, int n)
 		//printk("===================================transmit_registers===============================\n");
     }
   
-void SPK_LDO_ENABLE(int enable)
+static void SPK_LDO_ENABLE(int enable)
 {	
 	pr_err("SPK_LDO_ENABLE %d\n",enable);
 	gpio_direction_output(SPK_LDO_GPIO, enable);

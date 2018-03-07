@@ -43,7 +43,7 @@ static int gpio_led_set_led_brightness(struct device *dev, int index, unsigned c
 	if(index < 0 || index >= LED_PIN_COUNT)
 		return -1;
 
-	priv->led_brightness[index] = value ? 1 : 0;
+	priv->led_brightness[index] = value;
 	return 0;
 }
 
@@ -54,7 +54,7 @@ static int gpio_led_led_update(struct device *dev)
 
 	for(i = 0 ; i < LED_PIN_COUNT; i++){
 		if(priv->led_brightness_old[i] != priv->led_brightness[i]){
-			gpio_direction_output(priv->gpios[i], priv->led_brightness[i]);
+			gpio_direction_output(priv->gpios[i], priv->led_brightness[i] ? 1 : 0);
 			priv->led_brightness_old[i] = priv->led_brightness[i];
 		}
 	}
@@ -152,7 +152,7 @@ static int gpio_led_probe(struct platform_device *pdev)
 
 	leddrv_ops.dev = priv->dev;
 	if(register_backled_leddrv_func(&leddrv_ops) != 0) {
-		dev_err(priv->dev, "register_leddrv_func() failed\n"); 
+		dev_err(priv->dev, "register_backled_leddrv_func() failed\n"); 
 	}
 	return 0;
 }

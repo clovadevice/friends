@@ -1236,6 +1236,9 @@ static int msm_pcm_probe(struct platform_device *pdev)
 			if (!strcmp(latency_level, "ultra"))
 				pdata->perf_mode = ULTRA_LOW_LATENCY_PCM_MODE;
 		}
+#if 1 // hjkoh
+		pr_info("%s: latency_level: %s\n", __func__, latency_level);
+#endif
 	}
 	else
 		pdata->perf_mode = LEGACY_PCM_MODE;

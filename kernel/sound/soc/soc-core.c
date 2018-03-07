@@ -2168,20 +2168,26 @@ int snd_soc_update_bits(struct snd_soc_codec *codec, unsigned short reg,
 	bool change;
 	unsigned int old, new;
 	int ret;
+	
+	//printk(KERN_INFO"[%s] reg=0x%02x, mask=0x%x, value=0x%x\n", __func__, reg, mask, value);
 
 	if (codec->using_regmap) {
 		ret = regmap_update_bits_check(codec->control_data, reg,
 					       mask, value, &change);
+		//printk(KERN_INFO"[%s] Using regmap ret = %d \n", __func__, ret);
 	} else {
 		ret = snd_soc_read(codec, reg);
+		//printk(KERN_INFO"[%s] read = 0x%x / %d\n", __func__, ret, ret);
 		if (ret < 0)
 			return ret;
 
 		old = ret;
 		new = (old & ~mask) | (value & mask);
 		change = old != new;
-		if (change)
+		if (change) {
 			ret = snd_soc_write(codec, reg, new);
+			//printk(KERN_INFO"[%s] change reg=0x%02x, value=0x%x, ret=%d\n", __func__, reg, new, ret);
+		}
 	}
 
 	if (ret < 0)

@@ -1,4 +1,7 @@
 
+config CLOVA_MODELNAME
+    bool "CLOVA_MODELNAME"
+
 config IS3236A_LED_DRIVER
     bool "ISSI IS31FL3236A LED DRIVER"
     depends on I2C
@@ -9,12 +12,14 @@ config IS3737_LED_DRIVER
     depends on I2C
     select INFOMARK_LED_ANIMATION
 
+config LP5569_LED_DRIVER
+    bool "TI LP5569 LED DRIVER"
+    depends on I2C
+    select INFOMARK_LED_ANIMATION
+
 config INFOMARK_LED_ANIMATION
     bool "INFOMARK LED ANIMATION"
 
 config INFOMARK_GPIO_LED_DRIVER
     bool "INFOMARK GPIO LED DRIVER"
-
-
-
 

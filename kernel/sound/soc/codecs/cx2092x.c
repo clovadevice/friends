@@ -403,7 +403,7 @@ static const struct snd_kcontrol_new cx2092x_snd_controls[] = {
 	CX2092X_CONTROL("SendCmd", cmd_info, cmd_get, cmd_put,
 		SNDRV_CTL_ELEM_ACCESS_READ | SNDRV_CTL_ELEM_ACCESS_WRITE|
 		SNDRV_CTL_ELEM_ACCESS_VOLATILE),
-	CX2092X_CONTROL("Mode", mode_info, mode_get, mode_put,
+	CX2092X_CONTROL("CX20921Mode", mode_info, mode_get, mode_put,
 		SNDRV_CTL_ELEM_ACCESS_READ | SNDRV_CTL_ELEM_ACCESS_WRITE|
 		SNDRV_CTL_ELEM_ACCESS_VOLATILE),
 };
@@ -684,9 +684,10 @@ int cx2092x_dev_probe(struct device *dev, struct regmap *regmap)
 	dev_info(dev, "gpio_reset: %u\n", cx2092x->gpio_reset);
 	dev_info(dev, "gpio_pwr_enable_3p3: %u\n", cx2092x->gpio_pwr_enable_3p3);
 	dev_info(dev, "gpio_pwr_enable_1p8: %u\n", cx2092x->gpio_pwr_enable_1p8);
-	
-	gpio_direction_output(cx2092x->gpio_pwr_enable_3p3, 1);	
+
+	gpio_direction_output(cx2092x->gpio_pwr_enable_3p3, 1);
 	gpio_direction_output(cx2092x->gpio_pwr_enable_1p8, 1);
+
 #if 0
 	ret = sysfs_create_file(&dev->kobj, &dev_attr_reset_gpio.attr);
 	if(ret){

@@ -2657,7 +2657,9 @@ static struct snd_soc_dai_driver msm_dai_q6_mi2s_dai[] = {
 			.rate_min =     8000,
 			.rate_max =     48000,
 		},
+		#ifndef MI2S_CLOCK_ALWAYS_ON
 		.ops = &msm_dai_q6_mi2s_ops,
+		#endif
 		.id = MSM_PRIM_MI2S,
 		.probe = msm_dai_q6_dai_mi2s_probe,
 		.remove = msm_dai_q6_dai_mi2s_remove,

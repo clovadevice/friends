@@ -5,6 +5,21 @@ dtb-y += $(TARGET_PRODUCT).dtb
 ifeq ($(TARGET_PRODUCT),if_s300n)
 dtb-y += if_s300n_r2.dtb
 dtb-y += if_s300n_r3.dtb
+dtb-y += if_s300n_r4.dtb
+dtb-y += if_s300n_r10.dtb
+else ifeq ($(TARGET_PRODUCT),if_s301n)
+dtb-y += if_s301n_r2.dtb
+dtb-y += if_s301n_r3.dtb
+dtb-y += if_s301n_r4.dtb
+dtb-y += if_s301n_r10.dtb
+else ifeq ($(TARGET_PRODUCT),if_s600n)
+dtb-y += if_s600nl.dtb
+dtb-y += if_s600nl_r2.dtb
+dtb-y += if_s600n_r2.dtb
+else ifeq ($(TARGET_PRODUCT),if_s600nl)
+dtb-y += if_s600n.dtb
+dtb-y += if_s600n_r2.dtb
+dtb-y += if_s600nl_r2.dtb
 endif
 
 

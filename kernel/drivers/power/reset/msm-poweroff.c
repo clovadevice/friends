@@ -345,6 +345,9 @@ static void msm_restart_prepare(const char *cmd)
 					     restart_reason);
 		} else if (!strncmp(cmd, "edl", 3)) {
 			enable_emergency_dload_mode();
+		} else if (!strncmp(cmd, "charger", 7)) {
+			qpnp_pon_set_restart_reason(
+				PON_RESTART_REASON_CHARGERMODE);
 		} else {
 			__raw_writel(0x77665501, restart_reason);
 		}

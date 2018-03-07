@@ -19,6 +19,12 @@ struct led_brightness_t {
 	unsigned char blue;
 };
 
+struct led_blinking_t {
+	struct led_brightness_t led_brightness;
+	unsigned long on_period;
+	unsigned long off_period;
+};
+
 
 struct leddrv_func {
 	int num_leds;
@@ -38,6 +44,23 @@ struct led_priority_t {
     int priority;
 };
 
+struct led_blinking_priority_t {
+	struct led_blinking_t led_blinking;
+	struct led_priority_t led_priority;
+	bool status;
+};
+
+enum {
+	STOP_LED = 0,
+	RUNNING_LED
+};
+
+enum {
+	PRIORITY_HIGH = 1,
+	PRIORITY_SAME,
+	PRIORITY_LOW
+};
+
 #define LEDANIM_IOCTL_NUM	'L'
 
 #define LED_GET_BRIGHTNESS	_IOWR(LEDANIM_IOCTL_NUM, 1, void *)
@@ -47,6 +70,8 @@ struct led_priority_t {
 #define LED_GET_COUNT		_IOWR(LEDANIM_IOCTL_NUM, 5, void *)
 #define LED_SET_FRAME		_IOWR(LEDANIM_IOCTL_NUM, 6, void *)
 #define LED_SET_PRIORITY	_IOWR(LEDANIM_IOCTL_NUM, 7, void *)
+#define LED_BLINKING		_IOWR(LEDANIM_IOCTL_NUM, 8, void *)
+#define LED_SET_BRIGHTNESS_PRIORITY	_IOWR(LEDANIM_IOCTL_NUM, 9, void *)
 
 /* [START] 2017.08.21 kkkim Led*/
 #define LED_EMER    100
@@ -58,5 +83,7 @@ struct led_priority_t {
 #define LED_DEFAULT 0
 #define LED_INIT    255
 /* [END] 2017.08.21 kkkim Led*/
+
+#define LED_PRIORITY_COUNT	8
 
 #endif

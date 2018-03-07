@@ -32,6 +32,12 @@
 #define DMA_TX_TIMEOUT 200
 #define DMA_TPG_FIFO_LEN 64
 
+#define CEIL(x, y)		(((x) + ((y) - 1)) / (y))
+
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+#define NO_DISPLAY_OPTIMIZE 1
+#endif
+
 struct mdss_dsi_ctrl_pdata *ctrl_list[DSI_CTRL_MAX];
 
 struct mdss_hw mdss_dsi0_hw = {
@@ -1060,8 +1066,11 @@ static void mdss_dsi_mode_setup(struct mdss_panel_data *pdata)
 	height = pdata->panel_info.yres;
 
 	if (pdata->panel_info.type == MIPI_VIDEO_PANEL) {
-		dummy_xres = pdata->panel_info.lcdc.xres_pad;
-		dummy_yres = pdata->panel_info.lcdc.yres_pad;
+		dummy_xres = mult_frac((pdata->panel_info.lcdc.border_left +
+				pdata->panel_info.lcdc.border_right),
+				dst_bpp, pdata->panel_info.bpp);
+		dummy_yres = pdata->panel_info.lcdc.border_top +
+				pdata->panel_info.lcdc.border_bottom;
 	}
 
 	vsync_period = vspw + vbp + height + dummy_yres + vfp;
@@ -1770,9 +1779,14 @@ static int mdss_dsi_cmd_dma_tx(struct mdss_dsi_ctrl_pdata *ctrl,
 		goto end;
 	}
 
+	// wsshim
+	#ifdef NO_DISPLAY_OPTIMIZE
+	goto end;
+	#else
 	ret = wait_for_completion_timeout(&ctrl->dma_comp,
 				msecs_to_jiffies(DMA_TX_TIMEOUT));
-
+	#endif
+	
 	if (ret <= 0) {
 		u32 reg_val, status, mask;
 
@@ -1975,14 +1989,22 @@ void mdss_dsi_wait4video_done(struct mdss_dsi_ctrl_pdata *ctrl)
 static int mdss_dsi_wait4video_eng_busy(struct mdss_dsi_ctrl_pdata *ctrl)
 {
 	int ret = 0;
+	u32 v_total = 0, v_blank = 0, sleep_ms = 0, fps = 0;
+	struct mdss_panel_info *pinfo = &ctrl->panel_data.panel_info;
 
 	if (ctrl->panel_mode == DSI_CMD_MODE)
 		return ret;
 
 	if (ctrl->ctrl_state & CTRL_STATE_MDP_ACTIVE) {
 		mdss_dsi_wait4video_done(ctrl);
-		/* delay 4 ms to skip BLLP */
-		usleep(4000);
+		v_total = mdss_panel_get_vtotal(pinfo);
+		v_blank = pinfo->lcdc.v_back_porch + pinfo->lcdc.v_pulse_width;
+		fps = pinfo->mipi.frame_rate;
+
+		sleep_ms = CEIL((v_blank * 1000), (v_total * fps));
+		/* delay sleep_ms to skip BLLP */
+		if (sleep_ms)
+			usleep(sleep_ms * 1000);
 		ret = 1;
 	}
 

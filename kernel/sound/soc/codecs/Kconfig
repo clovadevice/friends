@@ -588,3 +588,8 @@ config SND_SOC_CX2092X
 
 # hjkoh: Texas Instruments TAS2559 SmartAmp
 source "sound/soc/codecs/ti/Kconfig"
+
+# wsshim: Realtek Audio Driver
+source "sound/soc/codecs/realtek/Kconfig"
+
+

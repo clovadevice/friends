@@ -517,6 +517,8 @@ struct tas2559_priv {
 	int ldo_enable_gpio;
 #endif
 	int tune_id;
+	int ntp8824_reset_gpio;
+
 };
 
 #endif /* _TAS2559_H */

@@ -42,7 +42,6 @@
 #include "q6voice.h"
 #include "sound/q6lsm.h"
 #include <sound/audio_cal_utils.h>
-#include "msm-dts-eagle.h"
 
 static int get_cal_path(int path_type);
 
@@ -142,11 +141,6 @@ static void msm_pcm_routing_cfg_pp(int port_id, int copp_idx, int topology,
 					__func__, topology, port_id, rc);
 		}
 		break;
-	case ADM_CMD_COPP_OPEN_TOPOLOGY_ID_DTS_HPX_0:
-	case ADM_CMD_COPP_OPEN_TOPOLOGY_ID_DTS_HPX_1:
-		pr_debug("%s: DTS_EAGLE_COPP_TOPOLOGY_ID\n", __func__);
-		msm_dts_eagle_init_post(port_id, copp_idx, topology);
-		break;
 	case ADM_CMD_COPP_OPEN_TOPOLOGY_ID_AUDIOSPHERE:
 		pr_debug("%s: TOPOLOGY_ID_AUDIOSPHERE\n", __func__);
 		msm_qti_pp_asphere_init(port_id, copp_idx);
@@ -177,11 +171,6 @@ static void msm_pcm_routing_deinit_pp(int port_id, int topology)
 			pr_debug("%s: DOLBY_ADM_COPP_TOPOLOGY_ID\n", __func__);
 			msm_dolby_dap_deinit(port_id);
 		}
-		break;
-	case ADM_CMD_COPP_OPEN_TOPOLOGY_ID_DTS_HPX_0:
-	case ADM_CMD_COPP_OPEN_TOPOLOGY_ID_DTS_HPX_1:
-		pr_debug("%s: DTS_EAGLE_COPP_TOPOLOGY_ID\n", __func__);
-		msm_dts_eagle_deinit_post(port_id, topology);
 		break;
 	case ADM_CMD_COPP_OPEN_TOPOLOGY_ID_AUDIOSPHERE:
 		pr_debug("%s: TOPOLOGY_ID_AUDIOSPHERE\n", __func__);
@@ -2976,7 +2965,41 @@ static const struct snd_kcontrol_new mmul8_mixer_controls[] = {
 	SOC_SINGLE_EXT("SLIM_6_TX", MSM_BACKEND_DAI_SLIMBUS_6_TX,
 	MSM_FRONTEND_DAI_MULTIMEDIA8, 1, 0, msm_routing_get_audio_mixer,
 	msm_routing_put_audio_mixer),
+
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+	// hjkoh: add pcm capture device
+	SOC_SINGLE_EXT("QUAT_MI2S_TX", MSM_BACKEND_DAI_QUATERNARY_MI2S_TX,
+	MSM_FRONTEND_DAI_MULTIMEDIA8, 1, 0, msm_routing_get_audio_mixer,
+	msm_routing_put_audio_mixer),
+#endif
 };
+
+//wjhyun 20171114 for voip support,multi mic open
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+static const struct snd_kcontrol_new mmul9_mixer_controls[] = {
+	SOC_SINGLE_EXT("INTERNAL_FM_TX", MSM_BACKEND_DAI_INT_FM_TX,
+	MSM_FRONTEND_DAI_MULTIMEDIA9, 1, 0, msm_routing_get_audio_mixer,
+	msm_routing_put_audio_mixer),
+	SOC_SINGLE_EXT("SLIM_0_TX", MSM_BACKEND_DAI_SLIMBUS_0_TX,
+	MSM_FRONTEND_DAI_MULTIMEDIA9, 1, 0, msm_routing_get_audio_mixer,
+	msm_routing_put_audio_mixer),
+	SOC_SINGLE_EXT("TERT_MI2S_TX", MSM_BACKEND_DAI_TERTIARY_MI2S_TX,
+	MSM_FRONTEND_DAI_MULTIMEDIA9, 1, 0, msm_routing_get_audio_mixer,
+	msm_routing_put_audio_mixer),
+	SOC_SINGLE_EXT("PRI_MI2S_TX", MSM_BACKEND_DAI_PRI_MI2S_TX,
+	MSM_FRONTEND_DAI_MULTIMEDIA9, 1, 0, msm_routing_get_audio_mixer,
+	msm_routing_put_audio_mixer),
+	SOC_SINGLE_EXT("QUAT_MI2S_TX", MSM_BACKEND_DAI_QUATERNARY_MI2S_TX, 
+  	MSM_FRONTEND_DAI_MULTIMEDIA9, 1, 0, msm_routing_get_audio_mixer, 
+  	msm_routing_put_audio_mixer), 
+	SOC_SINGLE_EXT("AUX_PCM_UL_TX", MSM_BACKEND_DAI_AUXPCM_TX,
+	MSM_FRONTEND_DAI_MULTIMEDIA9, 1, 0, msm_routing_get_audio_mixer,
+	msm_routing_put_audio_mixer),
+	SOC_SINGLE_EXT("SEC_AUX_PCM_UL_TX", MSM_BACKEND_DAI_SEC_AUXPCM_TX,
+	MSM_FRONTEND_DAI_MULTIMEDIA9, 1, 0, msm_routing_get_audio_mixer,
+	msm_routing_put_audio_mixer),
+};
+#endif
 
 static const struct snd_kcontrol_new pri_rx_voice_mixer_controls[] = {
 	SOC_SINGLE_EXT("CSVoice", MSM_BACKEND_DAI_PRI_I2S_RX,
@@ -5245,6 +5268,12 @@ static const struct snd_soc_dapm_widget msm_qdsp6_widgets[] = {
 	mmul6_mixer_controls, ARRAY_SIZE(mmul6_mixer_controls)),
 	SND_SOC_DAPM_MIXER("MultiMedia8 Mixer", SND_SOC_NOPM, 0, 0,
 	mmul8_mixer_controls, ARRAY_SIZE(mmul8_mixer_controls)),
+
+	//wjhyun 20171114 for voip support,multi mic open
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+	SND_SOC_DAPM_MIXER("MultiMedia9 Mixer", SND_SOC_NOPM, 0, 0,
+	mmul9_mixer_controls, ARRAY_SIZE(mmul9_mixer_controls)),
+#endif
 	SND_SOC_DAPM_MIXER("AUX_PCM_RX Audio Mixer", SND_SOC_NOPM, 0, 0,
 	auxpcm_rx_mixer_controls, ARRAY_SIZE(auxpcm_rx_mixer_controls)),
 	SND_SOC_DAPM_MIXER("SEC_AUX_PCM_RX Audio Mixer", SND_SOC_NOPM, 0, 0,
@@ -5588,6 +5617,12 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"QUAT_MI2S_RX Audio Mixer", "MultiMedia6", "MM_DL6"},
 	{"QUAT_MI2S_RX Audio Mixer", "MultiMedia7", "MM_DL7"},
 	{"QUAT_MI2S_RX Audio Mixer", "MultiMedia8", "MM_DL8"},
+
+	//wjhyun 20171114 for voip support,multi mic open
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+	{"QUAT_MI2S_RX Audio Mixer", "MultiMedia9", "MM_DL9"}, 
+#endif
+
 	{"QUAT_MI2S_RX Audio Mixer", "MultiMedia10", "MM_DL10"},
 	{"QUAT_MI2S_RX Audio Mixer", "MultiMedia11", "MM_DL11"},
 	{"QUAT_MI2S_RX Audio Mixer", "MultiMedia12", "MM_DL12"},
@@ -5639,6 +5674,12 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"PRI_MI2S_RX Audio Mixer", "MultiMedia5", "MM_DL5"},
 	{"PRI_MI2S_RX Audio Mixer", "MultiMedia6", "MM_DL6"},
 	{"PRI_MI2S_RX Audio Mixer", "MultiMedia7", "MM_DL7"},
+
+	//wjhyun 20171114 for voip support,multi mic open
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+	{"PRI_MI2S_RX Audio Mixer", "MultiMedia9", "MM_DL9"},
+#endif
+
 	{"PRI_MI2S_RX Audio Mixer", "MultiMedia10", "MM_DL10"},
 	{"PRI_MI2S_RX Audio Mixer", "MultiMedia11", "MM_DL11"},
 	{"PRI_MI2S_RX Audio Mixer", "MultiMedia12", "MM_DL12"},
@@ -5671,6 +5712,20 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"MultiMedia6 Mixer", "AUX_PCM_UL_TX", "AUX_PCM_TX"},
 	{"MultiMedia6 Mixer", "SEC_AUX_PCM_UL_TX", "SEC_AUX_PCM_TX"},
 
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+	// hjkoh: add pcm capture device
+	{"MultiMedia8 Mixer", "QUAT_MI2S_TX", "QUAT_MI2S_TX"},
+#endif
+
+	//wjhyun 20171114 for voip support,multi mic open
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+	{"MultiMedia9 Mixer", "SLIM_0_TX", "SLIMBUS_0_TX"},
+	{"MultiMedia9 Mixer", "QUAT_MI2S_TX", "QUAT_MI2S_TX"},
+	{"MultiMedia9 Mixer", "PRI_MI2S_TX", "PRI_MI2S_TX"},
+	{"MultiMedia9 Mixer", "AUX_PCM_UL_TX", "AUX_PCM_TX"},
+	{"MultiMedia9 Mixer", "SEC_AUX_PCM_UL_TX", "SEC_AUX_PCM_TX"},
+#endif
+	
 	{"INTERNAL_BT_SCO_RX Audio Mixer", "MultiMedia1", "MM_DL1"},
 	{"INTERNAL_BT_SCO_RX Audio Mixer", "MultiMedia2", "MM_DL2"},
 	{"INTERNAL_BT_SCO_RX Audio Mixer", "MultiMedia3", "MM_DL3"},
@@ -5688,6 +5743,11 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"INTERNAL_BT_SCO_RX Audio Mixer", "MultiMedia15", "MM_DL15"},
 	{"INTERNAL_BT_SCO_RX Audio Mixer", "MultiMedia16", "MM_DL16"},
 	{"INTERNAL_BT_SCO_RX Audio Mixer", "MultiMedia6", "MM_UL6"},
+
+	//wjhyun 20171114 for voip support,multi mic open
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+	{"INTERNAL_BT_SCO_RX Audio Mixer", "MultiMedia9", "MM_UL9"},
+#endif
 	{"INT_BT_SCO_RX", NULL, "INTERNAL_BT_SCO_RX Audio Mixer"},
 
 	{"INTERNAL_A2DP_RX Audio Mixer", "MultiMedia1", "MM_DL1"},
@@ -5755,6 +5815,11 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"MultiMedia5 Mixer", "INTERNAL_FM_TX", "INT_FM_TX"},
 	{"MultiMedia6 Mixer", "INTERNAL_FM_TX", "INT_FM_TX"},
 	{"MultiMedia8 Mixer", "INTERNAL_FM_TX", "INT_FM_TX"},
+	
+	//wjhyun 20171114 for voip support,multi mic open
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+	{"MultiMedia9 Mixer", "INTERNAL_FM_TX", "INT_FM_TX"},
+#endif
 
 	{"MultiMedia1 Mixer", "AFE_PCM_TX", "PCM_TX"},
 	{"MultiMedia4 Mixer", "AFE_PCM_TX", "PCM_TX"},
@@ -5767,6 +5832,11 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"MM_UL5", NULL, "MultiMedia5 Mixer"},
 	{"MM_UL6", NULL, "MultiMedia6 Mixer"},
 	{"MM_UL8", NULL, "MultiMedia8 Mixer"},
+
+	//wjhyun 20171114 for voip support,multi mic open
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+	{"MM_UL9", NULL, "MultiMedia9 Mixer"},
+#endif
 
 	{"AUX_PCM_RX Audio Mixer", "MultiMedia1", "MM_DL1"},
 	{"AUX_PCM_RX Audio Mixer", "MultiMedia2", "MM_DL2"},
@@ -5803,6 +5873,12 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"SEC_AUX_PCM_RX Audio Mixer", "MultiMedia15", "MM_DL15"},
 	{"SEC_AUX_PCM_RX Audio Mixer", "MultiMedia16", "MM_DL16"},
 	{"SEC_AUX_PCM_RX Audio Mixer", "MultiMedia6", "MM_UL6"},
+
+	//wjhyun 20171114 for voip support,multi mic open
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+	{"SEC_AUX_PCM_RX Audio Mixer", "MultiMedia9", "MM_UL9"},
+#endif
+
 	{"SEC_AUX_PCM_RX", NULL, "SEC_AUX_PCM_RX Audio Mixer"},
 
 	{"MI2S_RX_Voice Mixer", "CSVoice", "CS-VOICE_DL1"},

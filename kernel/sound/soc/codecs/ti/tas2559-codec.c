@@ -43,7 +43,7 @@
 #include <sound/soc.h>
 #include <sound/initval.h>
 #include <sound/tlv.h>
-
+#include <sound/q6afe-v2.h>
 #include "tas2559-core.h"
 #include "tas2559-codec.h"
 
@@ -55,6 +55,11 @@
 extern int get_tasxxx_amp_type(void);
 #endif
 
+#ifdef MI2S_CLOCK_ALWAYS_ON
+extern bool is_mi2s_enable(void);
+extern void set_mi2s_enable(bool enable);
+extern int set_mi2s_force_disable(void);
+#endif
 
 static unsigned int tas2559_codec_read(struct snd_soc_codec *pCodec,
 				       unsigned int nRegister)
@@ -870,6 +875,24 @@ static const struct snd_kcontrol_new tas2559_snd_controls[] = {
 		tas2559_dev_b_mute_get, tas2559_dev_b_mute_put),
 };
 
+#ifdef CONFIG_PM_SLEEP
+static int tas2559_codec_resume(struct snd_soc_codec *codec)
+{
+	pr_debug("[%s] \n", __func__);
+	return 0;
+}
+
+static int tas2559_codec_suspend(struct snd_soc_codec *codec)
+{
+	pr_debug("[%s] \n", __func__);
+	#ifdef MI2S_CLOCK_ALWAYS_ON
+	if(is_mi2s_enable())
+		set_mi2s_force_disable();
+	#endif
+	return 0;
+}
+#endif
+
 static struct snd_soc_codec_driver soc_codec_driver_tas2559 = {
 	.probe = tas2559_codec_probe,
 	.remove = tas2559_codec_remove,
@@ -883,6 +906,11 @@ static struct snd_soc_codec_driver soc_codec_driver_tas2559 = {
 	.num_dapm_widgets = ARRAY_SIZE(tas2559_dapm_widgets),
 	.dapm_routes = tas2559_audio_map,
 	.num_dapm_routes = ARRAY_SIZE(tas2559_audio_map),
+
+	#ifdef CONFIG_PM_SLEEP
+	.suspend = tas2559_codec_suspend, 
+	.resume = tas2559_codec_resume,
+	#endif
 };
 
 static struct snd_soc_dai_ops tas2559_dai_ops = {

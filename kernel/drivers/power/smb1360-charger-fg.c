@@ -252,6 +252,12 @@
 #define SMB1360_POWERON_DELAY_MS	2000
 #define SMB1360_FG_RESET_DELAY_MS	1500
 
+
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+// haksukim : add fg capacity
+#define USE_FG_CAPACITY_PROP
+#endif
+
 enum {
 	WRKRND_FG_CONFIG_FAIL = BIT(0),
 	WRKRND_BATT_DET_FAIL = BIT(1),
@@ -438,7 +444,7 @@ struct smb1360_chip {
 	struct power_supply		*usb_psy;
 	struct power_supply		batt_psy;
 // haksukim : add fg capacity
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
+#if defined(USE_FG_CAPACITY_PROP)
 	struct power_supply		*fg_psy;
 #endif
 	struct smb1360_otg_regulator	otg_vreg;
@@ -525,7 +531,7 @@ static int is_between(int value, int left, int right)
 	return 0;
 }
 
-#if !defined(CONFIG_TARGET_PRODUCT_IF_S300N)
+#if !defined(USE_FG_CAPACITY_PROP)
 static int bound(int val, int min, int max)
 {
 	if (val < min)
@@ -1140,6 +1146,7 @@ static enum power_supply_property smb1360_battery_properties[] = {
 	POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN,
 	POWER_SUPPLY_PROP_VOLTAGE_NOW,
 	POWER_SUPPLY_PROP_CURRENT_NOW,
+	POWER_SUPPLY_PROP_CURRENT_MAX,
 	POWER_SUPPLY_PROP_RESISTANCE,
 	POWER_SUPPLY_PROP_TEMP,
 	POWER_SUPPLY_PROP_SYSTEM_TEMP_LEVEL,
@@ -1228,7 +1235,7 @@ static int smb1360_get_prop_batt_health(struct smb1360_chip *chip)
 static int smb1360_get_prop_batt_capacity(struct smb1360_chip *chip)
 {
 // haksukim : add fg capacity
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
+#if defined(USE_FG_CAPACITY_PROP)
 	union power_supply_propval ret = {0,};
 
 	chip->fg_psy = power_supply_get_by_name("fg");
@@ -1994,6 +2001,9 @@ static int smb1360_battery_get_property(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_CURRENT_NOW:
 		val->intval = smb1360_get_prop_current_now(chip);
+		break;
+	case POWER_SUPPLY_PROP_CURRENT_MAX:
+		val->intval = chip->info_charge_max_ma * 1000;
 		break;
 	case POWER_SUPPLY_PROP_RESISTANCE:
 		val->intval = smb1360_get_prop_batt_resistance(chip);
@@ -2860,7 +2870,7 @@ static irqreturn_t smb1360_stat_handler(int irq, void *dev_id)
 
 	pr_debug("handler count = %d\n", handler_count);
 	if (handler_count) {
-#if !defined(CONFIG_TARGET_PRODUCT_IF_S300N)
+#if !defined(USE_FG_CAPACITY_PROP)
 		power_supply_changed(&chip->batt_psy);
 #endif
 	}

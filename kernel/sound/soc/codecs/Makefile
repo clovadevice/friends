@@ -291,3 +291,7 @@ obj-$(CONFIG_SND_SOC_TAS2559) += ti/
 # CX20921 and CX20924 ALSA SoC Audio driver
 snd-soc-cx2092x-objs := cx2092x.o cx2092x-i2c.o
 obj-$(CONFIG_SND_SOC_CX2092X) += snd-soc-cx2092x.o
+
+# wsshim: Realtek ALSA SoC Audio Driver
+obj-$(CONFIG_SND_SOC_REALTEK) += realtek/
+

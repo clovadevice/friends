@@ -39,6 +39,11 @@
 
 #define IS3236A_OUTPUT_CURRENT	IS3236A_OUTPUT_CURRENT_MAX_DIV_3
 
+#if !defined(SECURITY_FOR_FRIENDS)
+#define MAX_SIZE 4096
+#define SECURITY_FOR_FRIENDS
+#endif
+
 struct is3236_priv {
 	struct device *dev;
 	struct i2c_client *client;
@@ -266,7 +271,12 @@ static ssize_t is3236_max_current_show(struct device *dev,
 	struct is3236_priv * priv = dev_get_drvdata(dev);
 	if(!priv) return 0;
 
-	return sprintf(buf, "%u\n", priv->max_current);
+//--start stmdqls for security
+#if defined(SECURITY_FOR_FRIENDS)
+	return snprintf(buf, MAX_SIZE, "%u\n", priv->max_current);
+#else
+    return sprintf(buf, "%u\n", priv->max_current);
+#endif
 }
 
 static ssize_t is3236_max_current_store(struct device *dev,

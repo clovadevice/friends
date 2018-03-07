@@ -13,8 +13,11 @@
 #include <linux/proc_fs.h>
 #include <linux/uaccess.h>
 #include <linux/slab.h>
+#include <linux/init.h>
 
 #include "ledanim.h"
+
+#define LED_ANIMATION_LEDNUM_PER_FRAME	36
 
 static struct timer_list	anim_timer;
 static struct ledanim_t *	anim_current = NULL;
@@ -26,29 +29,72 @@ static struct leddrv_func *	leddrv_func = NULL;
 
 static struct timer_list	backled_timer;
 static int					is_backled_timer_started = 0;
+static struct led_blinking_t backled_blink_info;
 static struct leddrv_func *	backled_leddrv_func = NULL;
 
 static int g_priority = LED_DEFAULT;
 
-#if 1 
+static bool is_charger_mode = false; 
+
+static struct led_blinking_priority_t led_blinking_priority_list[LED_PRIORITY_COUNT];
+
+
+#if defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+#include "anim_fade_in_out.c"
+static struct ledanim_t ledanim_boot = {
+	.name = "__boot__",
+	.interval = 40,
+	.anim_count = 1584,
+	.anim = anim_fade_in_out,
+	.repeat = 0,
+};
+static struct led_blinking_t backled_boot_normal = {
+	.led_brightness = {
+		.red = 255,
+		.green = 150,
+		.blue = 50,
+	},
+	.on_period = 0,
+	.off_period = 0
+};
+static struct led_blinking_t backled_boot_charging = {
+	.led_brightness = {
+		.red = 255,
+		.green = 0,
+		.blue = 0,
+	},
+	.on_period = 0,
+	.off_period = 0
+};
+#else
 #include "anim_spin.c"
 static struct ledanim_t ledanim_boot = {
 	.name = "__boot__",
 	.interval = 40,
-	.anim_count = 3636,
+	.anim_count = 1296,
 	.anim = anim_spin,
 	.repeat = 0,
 };
-#else
-#include "anim_bootup.c"
-static struct ledanim_t ledanim_boot = {
-	.name = "__boot__",
-	.interval = 40,
-	.anim_count = 3636,
-	.anim = anim_bootup,
-	.repeat = 0,
+static struct led_blinking_t backled_boot_normal = {
+	.led_brightness = {
+		.red = 255,
+		.green = 255,
+		.blue = 255,
+	},
+	.on_period = 500,
+	.off_period = 500
 };
-#endif
+static struct led_blinking_t backled_boot_charging = {
+	.led_brightness = {
+		.red = 255,
+		.green = 0,
+		.blue = 0,
+	},
+	.on_period = 0,
+	.off_period = 0
+};
+#endif // defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+
 
 static void ledanimation_timer_function(unsigned long data);
 
@@ -136,7 +182,7 @@ static inline void start_anim_current(struct ledanim_t * ledanim)
 
 	anim_current = ledanim;
 	anim_frame_count = 0;
-	anim_total_frames = (uint32_t)(anim_current->anim_count / leddrv_func->num_leds);
+	anim_total_frames = (uint32_t)(anim_current->anim_count / LED_ANIMATION_LEDNUM_PER_FRAME);
 	anim_repeat_count = anim_current->repeat;
 	ledanimation_timer_function(0);
 }
@@ -156,21 +202,39 @@ static inline void delete_anim_current(void)
 
 static void backled_timer_function(unsigned long data)
 {
-	unsigned char value;
+	unsigned char red, green, blue;
+	int next;
 
 	if(backled_leddrv_func == NULL)
 		return;
 
-	if(backled_leddrv_func->get_led_brightness(backled_leddrv_func->dev, 0, &value) != 0){
-		printk(KERN_ERR "%s: backled get led brightness failed\n", __func__);	
-	} else {
-		value = value ? 0 : 1;
-		backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 0, value);
-		backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 1, value);
-		backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 2, value);
-		backled_leddrv_func->update(backled_leddrv_func->dev);
+	if(backled_leddrv_func->get_led_brightness(backled_leddrv_func->dev, 0, &red) != 0 ||
+			backled_leddrv_func->get_led_brightness(backled_leddrv_func->dev, 1, &green) != 0 ||
+			backled_leddrv_func->get_led_brightness(backled_leddrv_func->dev, 2, &blue) != 0){
+		printk(KERN_ERR "%s: backled get led brightness failed\n", __func__);
+		red = backled_blink_info.led_brightness.red;
+		green = backled_blink_info.led_brightness.green;
+		blue = backled_blink_info.led_brightness.blue;
 	}
-	mod_timer(&backled_timer, jiffies + msecs_to_jiffies(500));
+
+	if(red)	red = 0;
+	else red = backled_blink_info.led_brightness.red;
+	if(green) green = 0;
+	else green = backled_blink_info.led_brightness.green;
+	if(blue) blue = 0;
+	else blue = backled_blink_info.led_brightness.blue;
+
+	if(red || blue || green){
+		next = backled_blink_info.on_period;
+	} else {
+		next = backled_blink_info.off_period;
+	}
+	
+	backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 0, red);
+	backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 1, green);
+	backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 2, blue);
+	backled_leddrv_func->update(backled_leddrv_func->dev);
+	mod_timer(&backled_timer, jiffies + msecs_to_jiffies(next));
 }
 
 static void start_backled_boot_animation(void)
@@ -178,14 +242,18 @@ static void start_backled_boot_animation(void)
 	if(backled_leddrv_func == NULL)
 		return;
 
-	backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 0, 1);
-	backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 1, 1);
-	backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 2, 1);
+	backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 0, backled_blink_info.led_brightness.red);
+	backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 1, backled_blink_info.led_brightness.green );
+	backled_leddrv_func->set_led_brightness(backled_leddrv_func->dev, 2, backled_blink_info.led_brightness.blue);
 	backled_leddrv_func->update(backled_leddrv_func->dev);
+
+	if(backled_blink_info.on_period == 0 && backled_blink_info.off_period == 0) {
+		return;
+	}
 
 	init_timer(&backled_timer);
 	backled_timer.function = backled_timer_function;
-	mod_timer(&backled_timer, jiffies + msecs_to_jiffies(500));
+	mod_timer(&backled_timer, jiffies + msecs_to_jiffies(backled_blink_info.on_period));
 	is_backled_timer_started = 1;
 }
 
@@ -210,17 +278,12 @@ static void ledanimation_timer_function(unsigned long data)
 #endif
 
 	// ctrl led on/off
-	anim = anim_current->anim + (leddrv_func->num_leds*anim_frame_count);
+	anim = anim_current->anim + (LED_ANIMATION_LEDNUM_PER_FRAME*anim_frame_count);
 	_draw_led_frame(anim);
 
 	anim_frame_count++;
 	if(anim_frame_count >= anim_total_frames){
 		anim_frame_count = 0;
-
-		// TODO: fix 
-		if(strcmp(anim_current->name, "__boot__") == 0){
-			anim_frame_count = 16;
-		}
 		if(anim_repeat_count > 0 && --anim_repeat_count <= 0){
 			delete_anim_current();
 #ifdef DEBUG
@@ -331,6 +394,8 @@ static int ledanim_ioctl_set_brightness(unsigned long arg)
 		index_max += backled_leddrv_func->num_leds/3;
 	}
 
+	printk(KERN_INFO "[KHJ] %s: index_max is %d\n",__func__, index_max);
+
 	if (copy_from_user(&led_brightness, (int __user *)arg, sizeof(struct led_brightness_t))){
 		printk(KERN_ERR "%s: copy_from_user() failed\n", __func__);
 		return -EFAULT;
@@ -340,6 +405,8 @@ static int ledanim_ioctl_set_brightness(unsigned long arg)
 		printk(KERN_ERR "%s: invalid index: %d\n", __func__, led_brightness.index);
 		return -EFAULT;
 	}
+
+	printk(KERN_INFO "[KHJ] %s: led_brightness index is %d\n", __func__, led_brightness.index);
 
 	if(led_brightness.index < leddrv_func->num_leds/3) {
 		if(anim_current){
@@ -460,6 +527,7 @@ static int ledanim_ioctl_set_frame(unsigned long arg)
 
 	_draw_led_frame(ledanim->anim);
 
+#if 0 
 	if(backled_leddrv_func != NULL){
 		if(ledanim->anim_count > leddrv_func->num_leds){
 			int i;
@@ -476,6 +544,7 @@ static int ledanim_ioctl_set_frame(unsigned long arg)
 			}
 		}
 	}
+#endif
 
 	kfree(ledanim->anim);
 	kfree(ledanim);	
@@ -483,13 +552,149 @@ static int ledanim_ioctl_set_frame(unsigned long arg)
 	return 0;
 }
 
+
+static int ledanim_ioctl_blinking(unsigned long arg) 
+{
+	int index_max;
+	struct led_blinking_t led_blink_info;
+
+	if(!leddrv_func){
+		return -EFAULT;
+	}
+
+	index_max = leddrv_func->num_leds/3;
+	if(backled_leddrv_func != NULL){
+		index_max += backled_leddrv_func->num_leds/3;
+	}
+
+	if (copy_from_user(&led_blink_info, (int __user *)arg, sizeof(struct led_blinking_t))){
+		printk(KERN_ERR "%s: copy_from_user() failed\n", __func__);
+		return -EFAULT;
+	}
+
+	if(led_blink_info.led_brightness.index < 0 || led_blink_info.led_brightness.index >= index_max){
+		printk(KERN_ERR "%s: invalid index: %d\n", __func__, led_blink_info.led_brightness.index);
+		return -EFAULT;
+	}
+
+	if(led_blink_info.led_brightness.index < leddrv_func->num_leds/3) {
+		// 
+	} else {
+		if(is_backled_timer_started){
+			del_timer(&backled_timer);
+			is_backled_timer_started = 0;
+		}
+
+		memset(&backled_blink_info, 0, sizeof(struct led_blinking_t));
+		backled_blink_info.led_brightness.red = led_blink_info.led_brightness.red;
+		backled_blink_info.led_brightness.green = led_blink_info.led_brightness.green;
+		backled_blink_info.led_brightness.blue = led_blink_info.led_brightness.blue;
+
+		backled_blink_info.on_period = led_blink_info.on_period;
+		backled_blink_info.off_period = led_blink_info.off_period;
+		start_backled_boot_animation();
+		return 0;
+	}
+	return -EFAULT;
+}
+
+static void led_priority_list_updata(struct led_blinking_priority_t *led_blinking_priority_info)
+{
+	int i;
+	struct led_blinking_priority_t *led_blinking_priority_updata = led_blinking_priority_info;
+
+	for (i = 0; i < LED_PRIORITY_COUNT; i++) {
+		if (led_blinking_priority_list[i].led_priority.priority == led_blinking_priority_updata->led_priority.priority) {
+			led_blinking_priority_list[i].led_blinking.led_brightness.index = led_blinking_priority_updata->led_blinking.led_brightness.index;
+			led_blinking_priority_list[i].led_blinking.led_brightness.red = led_blinking_priority_updata->led_blinking.led_brightness.red;
+			led_blinking_priority_list[i].led_blinking.led_brightness.green = led_blinking_priority_updata->led_blinking.led_brightness.green;
+			led_blinking_priority_list[i].led_blinking.led_brightness.blue = led_blinking_priority_updata->led_blinking.led_brightness.blue;
+			led_blinking_priority_list[i].led_blinking.on_period = led_blinking_priority_updata->led_blinking.on_period;
+			led_blinking_priority_list[i].led_blinking.off_period = led_blinking_priority_updata->led_blinking.off_period;
+			led_blinking_priority_list[i].status = led_blinking_priority_updata->status;
+		}
+	}
+}
+
+static int ledanim_ioctl_set_brightness_priority(unsigned long arg) 
+{
+	int index_max, i, j;
+	struct led_blinking_priority_t led_blinking_priority_info;
+
+	if(!leddrv_func){
+		return -EFAULT;
+	}
+
+	index_max = leddrv_func->num_leds/3;
+	if(backled_leddrv_func != NULL){
+		index_max += backled_leddrv_func->num_leds/3;
+	}
+
+	if (copy_from_user(&led_blinking_priority_info, (int __user *)arg, sizeof(struct led_blinking_priority_t))){
+		printk(KERN_ERR "%s: copy_from_user() failed\n", __func__);
+		return -EFAULT;
+	}
+
+	if(led_blinking_priority_info.led_blinking.led_brightness.index < 0 || led_blinking_priority_info.led_blinking.led_brightness.index >= index_max){
+		printk(KERN_ERR "%s: invalid index: %d\n", __func__, led_blinking_priority_info.led_blinking.led_brightness.index);
+		return -EFAULT;
+	}
+
+	if(led_blinking_priority_info.led_blinking.led_brightness.index < leddrv_func->num_leds/3) {
+		// 
+	} else {
+		if(is_backled_timer_started){
+			del_timer(&backled_timer);
+			is_backled_timer_started = 0;
+		}
+
+		led_priority_list_updata(&led_blinking_priority_info);
+		for (i = 0; i < LED_PRIORITY_COUNT; i++) {
+			if (led_blinking_priority_list[i].status == RUNNING_LED) {
+				if (led_blinking_priority_list[i].led_blinking.on_period == 0 && led_blinking_priority_list[i].led_blinking.off_period == 0) {
+					j = led_blinking_priority_list[i].led_blinking.led_brightness.index * 3;
+					if(_set_led(j, led_blinking_priority_list[i].led_blinking.led_brightness.red) != 0 ||
+						_set_led(j + 1, led_blinking_priority_list[i].led_blinking.led_brightness.green) != 0 ||
+						_set_led(j + 2, led_blinking_priority_list[i].led_blinking.led_brightness.blue) != 0){
+						printk(KERN_ERR "%s: _set_led() failed\n", __func__);
+						return -EFAULT;
+					}
+					backled_leddrv_func->update(backled_leddrv_func->dev);
+				}
+				else {
+					memset(&backled_blink_info, 0, sizeof(struct led_blinking_t));
+					backled_blink_info.led_brightness.red = led_blinking_priority_list[i].led_blinking.led_brightness.red;
+					backled_blink_info.led_brightness.green = led_blinking_priority_list[i].led_blinking.led_brightness.green;
+					backled_blink_info.led_brightness.blue = led_blinking_priority_list[i].led_blinking.led_brightness.blue;
+					backled_blink_info.on_period = led_blinking_priority_list[i].led_blinking.on_period;
+					backled_blink_info.off_period = led_blinking_priority_list[i].led_blinking.off_period;
+					start_backled_boot_animation();
+				}
+				break;
+			}
+		}
+		
+		if (i == LED_PRIORITY_COUNT) {
+			j = 0;
+			if(_set_led(j, 0) != 0 ||
+				_set_led(j + 1, 0) != 0 ||
+				_set_led(j + 2, 0) != 0){
+				printk(KERN_ERR "%s: _set_led() failed\n", __func__);
+				return -EFAULT;
+			}
+			backled_leddrv_func->update(backled_leddrv_func->dev);
+		}
+		return 0;
+	}
+	return -EFAULT;
+}
+
 static long ledanim_unlocked_ioctl(struct file *file, unsigned int req, unsigned long arg)
 {
 	int err = -EBADRQC;
-    int prio = LED_DEFAULT;
-//struct led_priority_t *led_p = NULL;
-struct led_priority_t *led_p = file->private_data;
-//led_p = kzalloc(sizeof(struct led_priority_t), GFP_KERNEL);
+	int prio = LED_DEFAULT;
+
+	struct led_priority_t *led_p = file->private_data;
 
 #ifdef DEBUG
 	printk("%s: ioctl: req 0x%x\n", __func__, req);
@@ -503,42 +708,94 @@ struct led_priority_t *led_p = file->private_data;
 		err = ledanim_ioctl_set_brightness(arg);
 		break;
 	case LED_SET_FRAME:
-        if(g_priority <= led_p->priority){
-		    err = ledanim_ioctl_set_frame(arg);
-            g_priority = led_p->priority;
-        }
+		if(g_priority <= led_p->priority){
+			err = ledanim_ioctl_set_frame(arg);
+			if(!err)
+				g_priority = led_p->priority;
+		}
 		break;
 	case LED_ANIM_START:
-        if(g_priority <= led_p->priority){
-		    err = ledanim_ioctl_start(arg);
-            g_priority = led_p->priority;
-        }
+		if(g_priority <= led_p->priority){
+			err = ledanim_ioctl_start(arg);
+			if(!err)
+				g_priority = led_p->priority;
+		}
 		break;
 	case LED_ANIM_STOP:
 		err = ledanim_ioctl_stop(arg);
-        g_priority = LED_DEFAULT;
+		g_priority = LED_DEFAULT;
 		break;
 	case LED_GET_COUNT:
 		err = ledanim_ioctl_get_led_count(arg);
 		break;
-    case LED_SET_PRIORITY:
-        prio = (int)arg;
+	case LED_SET_PRIORITY:
+		prio = (int)arg;
 
 #ifdef DEBUG
 		printk(KERN_ERR "LED_SET_PRIORITY %d\n", prio);
 #endif
-        if(prio == LED_INIT) {
-            led_p->priority = LED_DEFAULT;
-            g_priority = LED_DEFAULT;
-        }else{
-            led_p->priority = prio; 
-        }
-        file->private_data = led_p;
-        err = 0;
-        break;
+		if(prio == LED_INIT) {
+			led_p->priority = LED_DEFAULT;
+			g_priority = LED_DEFAULT;
+		}else{
+			led_p->priority = prio; 
+		}
+		file->private_data = led_p;
+		err = 0;
+		break;
+	case LED_BLINKING:
+		if(g_priority <= led_p->priority){
+			err = ledanim_ioctl_blinking(arg);
+			if(!err)
+				g_priority = led_p->priority;
+		}
+		break;
+	case LED_SET_BRIGHTNESS_PRIORITY:
+		err = ledanim_ioctl_set_brightness_priority(arg);
+		break;
 	}
 	return err;
 }
+
+static void backled_priority_init(void) {
+	int i = 0;
+
+	for (i = 0; i < LED_PRIORITY_COUNT; i++ )
+	{
+		led_blinking_priority_list[i].led_blinking.led_brightness.index = 0;
+		led_blinking_priority_list[i].led_blinking.led_brightness.red = 0;
+		led_blinking_priority_list[i].led_blinking.led_brightness.green = 0;
+		led_blinking_priority_list[i].led_blinking.led_brightness.blue = 0;
+		led_blinking_priority_list[i].led_blinking.on_period = 0;
+		led_blinking_priority_list[i].led_blinking.off_period = 0;
+		if (i == 0) {
+			led_blinking_priority_list[i].led_priority.priority = LED_INIT;
+		}
+		else if (i == 1) {
+			led_blinking_priority_list[i].led_priority.priority = LED_EMER;
+		}
+		else if (i == 2) {
+			led_blinking_priority_list[i].led_priority.priority = LED_HIGHEST;
+		}
+		else if (i == 3) {
+			led_blinking_priority_list[i].led_priority.priority = LED_HIGH;
+		}
+		else if (i == 4) {
+			led_blinking_priority_list[i].led_priority.priority = LED_NORMAL;
+		}
+		else if (i == 5) {
+			led_blinking_priority_list[i].led_priority.priority = LED_LOW;
+		}
+		else if (i == 6) {
+			led_blinking_priority_list[i].led_priority.priority = LED_LOWEST;
+		}
+		else {
+			led_blinking_priority_list[i].led_priority.priority = LED_DEFAULT;
+		}
+		led_blinking_priority_list[i].status = STOP_LED;
+	}
+}
+
 static int ledanim_open(struct inode *inode, struct file *file) {
 	struct led_priority_t *led_p = NULL;
 	led_p = kzalloc(sizeof(struct led_priority_t), GFP_KERNEL);
@@ -575,6 +832,10 @@ static int __init ledanim_init(void)
 	printk("%s: init\n", __func__);
 #endif
 
+	backled_priority_init();
+
+	is_charger_mode = strstr(saved_command_line, "androidboot.mode=charger") ? true : false;
+
 	return misc_register(&ledanim_miscdev);
 }
 device_initcall(ledanim_init);
@@ -588,7 +849,13 @@ int register_leddrv_func(struct leddrv_func * func)
 	init_timer(&anim_timer);
 	anim_timer.function = ledanimation_timer_function;
 
-	start_anim_current(&ledanim_boot);
+	if(is_charger_mode){
+		// turn off all
+		_set_led_all_off();
+	} else {
+		printk("start boot animation. name:spin, color:ff9632(warmwhite)\n"); 
+		start_anim_current(&ledanim_boot);
+	}
 	return 0;
 }
 EXPORT_SYMBOL(register_leddrv_func);
@@ -600,8 +867,15 @@ int register_backled_leddrv_func(struct leddrv_func * func)
 	}
 
 	backled_leddrv_func = func;
-	start_backled_boot_animation();
 
+	memset(&backled_blink_info, 0, sizeof(struct led_blinking_t));	
+
+	if(is_charger_mode){
+		memcpy(&backled_blink_info, &backled_boot_charging, sizeof(struct led_blinking_t));
+	} else {
+		memcpy(&backled_blink_info, &backled_boot_normal, sizeof(struct led_blinking_t));
+	}
+	start_backled_boot_animation();
 	return 0;
 }
 EXPORT_SYMBOL(register_backled_leddrv_func);

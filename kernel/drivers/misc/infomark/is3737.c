@@ -62,6 +62,10 @@
 
 #define IS3737_GLOBAL_CURRENT_VALUE			0xFF
 
+#if !defined(SECURITY_FOR_FRIENDS)
+#define MAX_SIZE 4096
+#define SECURITY_FOR_FRIENDS
+#endif
 
 static unsigned char led_enable_map_for_champ[IS3737_LED_ON_OFF_REG_COUNT] = {
 #if defined(ENABLE_SECOND_LINE)
@@ -251,9 +255,55 @@ static int is3737_set_led_on(struct is3737_priv *priv, int on)
 	return 0;
 }
 
+static int is3737_set_led_pwm(struct is3737_priv *priv)
+{
+	int i,rc;
+
+	mutex_lock(&priv->mutex);
+
+	// select pwm register page
+	rc = is3737_page_select(priv, IS3737_PAGE_PWM_REGISTER);
+
+	if(rc != 0) {
+		mutex_unlock(&priv->mutex);
+		return rc;
+	}
+
+	for(i = 0 ; i < LED_PIN_COUNT; i+=3){
+#if defined(ENABLE_CALIBRATE_PWM)
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i], calpwm_tbl_red[priv->led_brightness[i]]);
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+1], calpwm_tbl_green[priv->led_brightness[i+1]]);
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+2], calpwm_tbl_blue[priv->led_brightness[i+2]]);
+#if defined(ENABLE_SECOND_LINE) // enable SW 2,4,6,8,10,12
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i] + 0x10, calpwm_tbl_red[priv->led_brightness[i]]);
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+1] + 0x10, calpwm_tbl_green[priv->led_brightness[i+1]]);
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+2] + 0x10, calpwm_tbl_blue[priv->led_brightness[i+2]]);
+#endif
+#else
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i], priv->led_brightness[i]);
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+1], priv->led_brightness[i+1]);
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+2], priv->led_brightness[i+2]);
+#if defined(ENABLE_SECOND_LINE) // enable SW 2,4,6,8,10,12
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i] + 0x10, priv->led_brightness[i]);
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+1] + 0x10, priv->led_brightness[i+1]);
+		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+2] + 0x10, priv->led_brightness[i+2]);
+#endif
+#endif
+	}
+
+	mutex_unlock(&priv->mutex);
+	return 0;
+}
+
 static int is3737_shutdown_control(struct is3737_priv *priv, int on)
 {
 	int rc = 0;
+
+	if(on){
+		// initial all off
+		memset(priv->led_brightness, 0, sizeof(priv->led_brightness));
+		is3737_set_led_pwm(priv);
+	}
 
 	mutex_lock(&priv->mutex);
 
@@ -370,9 +420,10 @@ static int is3737_set_max_current(struct device *dev, unsigned char value)
 	return 0;
 }
 
+
 static void is3737_led_update_work(struct work_struct *work)
 {
-	int i,rc;
+	int rc;
 #ifdef PRINT_LED_UPDATE_LATENCY
 	int64_t latency; 
 #endif
@@ -387,43 +438,17 @@ static void is3737_led_update_work(struct work_struct *work)
 	pm_qos_update_request(&priv->pm_qos_request, PM_QOS_VALUE);
 #endif
 
-
-	mutex_lock(&priv->mutex);
-
 #ifdef PRINT_LED_UPDATE_LATENCY
 	latency = ktime_to_ns(ktime_get());
 #endif
 
-	// select pwm register page
-	rc = is3737_page_select(priv, IS3737_PAGE_PWM_REGISTER);
+	rc = is3737_set_led_pwm(priv);
 	if(rc != 0) {
-		mutex_unlock(&priv->mutex);
 #if defined(USE_PM_QOS)
 		pm_qos_update_request(&priv->pm_qos_request, PM_QOS_DEFAULT_VALUE);
 #endif
+		dev_err(priv->dev, "IS3737 is3737_set_led_pwm() failed\n");
 		return;
-	}
-
-	for(i = 0 ; i < LED_PIN_COUNT; i+=3){
-#if defined(ENABLE_CALIBRATE_PWM)
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i], calpwm_tbl_red[priv->led_brightness[i]]);
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+1], calpwm_tbl_green[priv->led_brightness[i+1]]);
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+2], calpwm_tbl_blue[priv->led_brightness[i+2]]);
-#if defined(ENABLE_SECOND_LINE) // enable SW 2,4,6,8,10,12
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i] + 0x10, calpwm_tbl_red[priv->led_brightness[i]]);
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+1] + 0x10, calpwm_tbl_green[priv->led_brightness[i+1]]);
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+2] + 0x10, calpwm_tbl_blue[priv->led_brightness[i+2]]);
-#endif
-#else
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i], priv->led_brightness[i]);
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+1], priv->led_brightness[i+1]);
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+2], priv->led_brightness[i+2]);
-#if defined(ENABLE_SECOND_LINE) // enable SW 2,4,6,8,10,12
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i] + 0x10, priv->led_brightness[i]);
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+1] + 0x10, priv->led_brightness[i+1]);
-		is3737_i2c_write_device(priv, led_pwm_reg_map_for_champ[i+2] + 0x10, priv->led_brightness[i+2]);
-#endif
-#endif
 	}
 
 #ifdef PRINT_LED_UPDATE_LATENCY
@@ -431,8 +456,7 @@ static void is3737_led_update_work(struct work_struct *work)
 	latency += (NSEC_PER_MSEC / 2);
 	do_div(latency, NSEC_PER_MSEC);
 	dev_err(priv->dev, "IS3737 led_update_work latency:%llu msec\n", latency);
-#endif
-	mutex_unlock(&priv->mutex);
+#endif	
 
 #if defined(USE_PM_QOS)
 	pm_qos_update_request(&priv->pm_qos_request, PM_QOS_DEFAULT_VALUE);
@@ -452,7 +476,6 @@ static int _is3737_led_power_enable(struct i2c_client *client, int enable)
 		dev_dbg(priv->dev, "led-enable gpio set to high\n");
 		gpio_direction_output(priv->led_enable_gpio, 1);
 		gpio_direction_output(priv->led_shutdown_gpio, 1);
-
 		
 		if(is3737_shutdown_control(priv, 1) == 0 && 
 			is3737_set_led_on(priv, 1) == 0) {
@@ -495,7 +518,12 @@ static ssize_t is3737_max_current_show(struct device *dev,
 	struct is3737_priv * priv = dev_get_drvdata(dev);
 	if(!priv) return 0;
 
+//--start stmdqls for security
+#if defined(SECURITY_FOR_FRIENDS)
+    return snprintf(buf, MAX_SIZE, "%u\n", priv->max_current);
+#else
 	return sprintf(buf, "%u\n", priv->max_current);
+#endif
 }
 
 static ssize_t is3737_max_current_store(struct device *dev,

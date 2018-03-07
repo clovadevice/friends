@@ -126,6 +126,12 @@
 #define QPNP_POFF_REASON_UVLO			13
 
 
+
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+// hjkoh: support sysfs for PON HARD RESET enable/disable control
+#define USE_QPNP_PON_HARD_RESET_CONTROL
+#endif
+
 enum pon_type {
 	PON_KPDPWR,
 	PON_RESIN,
@@ -349,6 +355,7 @@ static ssize_t qpnp_pon_dbc_store(struct device *dev,
 
 static DEVICE_ATTR(debounce_us, 0664, qpnp_pon_dbc_show, qpnp_pon_dbc_store);
 
+#if defined(USE_QPNP_PON_HARD_RESET_CONTROL)
 static struct qpnp_pon_config *
 qpnp_get_cfg(struct qpnp_pon *pon, u32 pon_type)
 {
@@ -447,6 +454,7 @@ static ssize_t reset_timer_store(struct device *dev,
 
 
 static DEVICE_ATTR(timer_reset, 0664, reset_timer_show, reset_timer_store);
+#endif // defined(USE_QPNP_PON_HARD_RESET_CONTROL)
 /**
  * qpnp_pon_system_pwr_off - Configure system-reset PMIC for shutdown or reset
  * @type: Determines the type of power off to perform - shutdown, reset, etc
@@ -635,6 +643,21 @@ static int qpnp_pon_store_and_clear_warm_reset(struct qpnp_pon *pon)
 	return 0;
 }
 
+#if defined(USE_QPNP_PON_HARD_RESET_CONTROL)
+#else
+static struct qpnp_pon_config *
+qpnp_get_cfg(struct qpnp_pon *pon, u32 pon_type)
+{
+	int i;
+
+	for (i = 0; i < pon->num_pon_config; i++) {
+		if (pon_type == pon->pon_cfg[i].pon_type)
+			return  &pon->pon_cfg[i];
+	}
+
+	return NULL;
+}
+#endif // defined(USE_QPNP_PON_HARD_RESET_CONTROL)
 
 static int
 qpnp_pon_input_dispatch(struct qpnp_pon *pon, u32 pon_type)
@@ -694,21 +717,6 @@ qpnp_pon_input_dispatch(struct qpnp_pon *pon, u32 pon_type)
 
 	cfg->old_state = !!key_status;
 
-
-    // kkkim factory reset disable
-
-    printk("============ 000 %d\n",key_status);
-    if(key_status){ // press  mute check
- //       ts=kthread_run(muteThread, (void *)&m, "MuteThread");
- //       if(ts){
- //           wake_up_process(ts);
- //       }
-    }else{      // unpress
- //       if(ts){
- //           kthread_stop(ts);
- //       }
- //       pmic_s2_reset_enable(pon, cfg->s2_cntl2_addr);
-    }
 	return 0;
 }
 
@@ -726,7 +734,6 @@ static irqreturn_t qpnp_kpdpwr_irq(int irq, void *_pon)
 
 static irqreturn_t qpnp_kpdpwr_bark_irq(int irq, void *_pon)
 {
-
 	return IRQ_HANDLED;
 }
 
@@ -865,7 +872,6 @@ static irqreturn_t qpnp_resin_bark_irq(int irq, void *_pon)
 	struct qpnp_pon *pon = _pon;
 	struct qpnp_pon_config *cfg;
 
-    printk("=========== 444");
 	/* disable the bark interrupt */
 	disable_irq_nosync(irq);
 
@@ -929,12 +935,10 @@ qpnp_config_reset(struct qpnp_pon *pon, struct qpnp_pon_config *cfg)
 	int rc;
 	u8 i;
 	u16 s1_timer_addr, s2_timer_addr;
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
+#if defined(USE_QPNP_PON_HARD_RESET_CONTROL)
 	u8 pon_rt_sts = 0;
-#endif
 	int pon_rt_sts_kpdpwr = 0;
 
-#if defined(CONFIG_TARGET_PRODUCT_IF_S300N)
 	/* read the bark RT status */
 	rc = spmi_ext_register_readl(pon->spmi->ctrl, pon->spmi->sid,
 				QPNP_PON_RT_STS(pon->base), &pon_rt_sts, 1);
@@ -963,9 +967,10 @@ qpnp_config_reset(struct qpnp_pon *pon, struct qpnp_pon_config *cfg)
 	default:
 		return -EINVAL;
 	}
-
+#if defined(USE_QPNP_PON_HARD_RESET_CONTROL)
 	if (pon_rt_sts_kpdpwr != 1)
 	{
+#endif // defined(USE_QPNP_PON_HARD_RESET_CONTROL)	
 		/* disable S2 reset */
 		rc = qpnp_pon_masked_write(pon, cfg->s2_cntl2_addr,
 					QPNP_PON_S2_CNTL_EN, 0);
@@ -973,7 +978,9 @@ qpnp_config_reset(struct qpnp_pon *pon, struct qpnp_pon_config *cfg)
 			dev_err(&pon->spmi->dev, "Unable to configure S2 enable\n");
 			return rc;
 		}
+#if defined(USE_QPNP_PON_HARD_RESET_CONTROL)		
 	}
+#endif // defined(USE_QPNP_PON_HARD_RESET_CONTROL)	
 
 	usleep(100);
 
@@ -1031,14 +1038,11 @@ qpnp_pon_request_irqs(struct qpnp_pon *pon, struct qpnp_pon_config *cfg)
 							qpnp_kpdpwr_irq,
 				IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING,
 						"qpnp_kpdpwr_status", pon);
-
-
 		if (rc < 0) {
 			dev_err(&pon->spmi->dev, "Can't request %d IRQ\n",
 							cfg->state_irq);
 			return rc;
 		}
-            
 		if (cfg->use_bark) {
 			rc = devm_request_irq(&pon->spmi->dev, cfg->bark_irq,
 						qpnp_kpdpwr_bark_irq,
@@ -1806,13 +1810,23 @@ static int qpnp_pon_probe(struct spmi_device *spmi)
 		dev_err(&spmi->dev, "sys file creation failed\n");
 		return rc;
 	}
-
+#if defined(USE_QPNP_PON_HARD_RESET_CONTROL)
     rc = device_create_file(&spmi->dev, &dev_attr_timer_reset);
 	if (rc) {
 		dev_err(&spmi->dev, "sys file creation failed\n");
 		return rc;
 	}
-    
+#endif // defined(USE_QPNP_PON_HARD_RESET_CONTROL)
+
+	if (of_property_read_bool(spmi->dev.of_node,
+					"qcom,pon-reset-off")) {
+		rc = qpnp_pon_trigger_config(PON_CBLPWR_N, false);
+		if (rc) {
+			dev_err(&spmi->dev, "failed update the PON_CBLPWR %d\n",
+				rc);
+		}
+	}
+
 	/* config whether store the hard reset reason */
 	pon->store_hard_reset_reason = of_property_read_bool(
 					spmi->dev.of_node,
@@ -1827,7 +1841,9 @@ static int qpnp_pon_remove(struct spmi_device *spmi)
 	struct qpnp_pon *pon = dev_get_drvdata(&spmi->dev);
 
 	device_remove_file(&spmi->dev, &dev_attr_debounce_us);
+#if defined(USE_QPNP_PON_HARD_RESET_CONTROL)	
 	device_remove_file(&spmi->dev, &dev_attr_timer_reset);
+#endif // defined(USE_QPNP_PON_HARD_RESET_CONTROL)	
 
 	cancel_delayed_work_sync(&pon->bark_work);
 

@@ -253,6 +253,57 @@ out:
 	return error;
 }
 
+static ssize_t gpio_keys_attr_info_store_helper(struct gpio_keys_drvdata *ddata,
+					   const char *buf, unsigned int type)
+{
+	int n_events = get_n_events_by_type(type);
+	unsigned long *bits;
+	ssize_t error;
+	int i;
+
+	bits = kcalloc(BITS_TO_LONGS(n_events), sizeof(*bits), GFP_KERNEL);
+	if (!bits)
+		return -ENOMEM;
+
+	error = bitmap_parselist(buf, bits, n_events);
+	if (error)
+		goto out;
+
+	/* First validate */
+	for (i = 0; i < ddata->pdata->nbuttons; i++) {
+		struct gpio_button_data *bdata = &ddata->data[i];
+
+		if (bdata->button->type != type)
+			continue;
+
+		if (test_bit(bdata->button->code, bits) &&
+		    !bdata->button->can_disable) {
+			error = -EINVAL;
+			goto out;
+		}
+	}
+
+	mutex_lock(&ddata->disable_lock);
+
+	for (i = 0; i < ddata->pdata->nbuttons; i++) {
+		struct gpio_button_data *bdata = &ddata->data[i];
+
+		if (bdata->button->type != type)
+			continue;
+
+		if (*buf == '1')
+			gpio_keys_disable_button(bdata);
+		else
+			gpio_keys_enable_button(bdata);
+	}
+
+	mutex_unlock(&ddata->disable_lock);
+
+out:
+	kfree(bits);
+	return error;
+}
+
 #define ATTR_SHOW_FN(name, type, only_disabled)				\
 static ssize_t gpio_keys_show_##name(struct device *dev,		\
 				     struct device_attribute *attr,	\
@@ -269,6 +320,7 @@ ATTR_SHOW_FN(keys, EV_KEY, false);
 ATTR_SHOW_FN(switches, EV_SW, false);
 ATTR_SHOW_FN(disabled_keys, EV_KEY, true);
 ATTR_SHOW_FN(disabled_switches, EV_SW, true);
+ATTR_SHOW_FN(disabled_info_keys, EV_KEY, true);
 
 /*
  * ATTRIBUTES:
@@ -299,6 +351,24 @@ static ssize_t gpio_keys_store_##name(struct device *dev,		\
 ATTR_STORE_FN(disabled_keys, EV_KEY);
 ATTR_STORE_FN(disabled_switches, EV_SW);
 
+#define ATTR_INFO_STORE_FN(name, type)					\
+static ssize_t gpio_keys_info_store_##name(struct device *dev,		\
+				      struct device_attribute *attr,	\
+				      const char *buf,			\
+				      size_t count)			\
+{									\
+	struct platform_device *pdev = to_platform_device(dev);		\
+	struct gpio_keys_drvdata *ddata = platform_get_drvdata(pdev);	\
+	ssize_t error;							\
+									\
+	error = gpio_keys_attr_info_store_helper(ddata, buf, type);		\
+	if (error)							\
+		return error;						\
+									\
+	return count;							\
+}
+ATTR_INFO_STORE_FN(disabled_info_keys, EV_KEY);
+
 /*
  * ATTRIBUTES:
  *
@@ -311,12 +381,16 @@ static DEVICE_ATTR(disabled_keys, S_IWUSR | S_IRUGO,
 static DEVICE_ATTR(disabled_switches, S_IWUSR | S_IRUGO,
 		   gpio_keys_show_disabled_switches,
 		   gpio_keys_store_disabled_switches);
+static DEVICE_ATTR(disabled_info_keys, S_IWUSR | S_IRUGO,
+		   gpio_keys_show_disabled_info_keys,
+		   gpio_keys_info_store_disabled_info_keys);
 
 static struct attribute *gpio_keys_attrs[] = {
 	&dev_attr_keys.attr,
 	&dev_attr_switches.attr,
 	&dev_attr_disabled_keys.attr,
 	&dev_attr_disabled_switches.attr,
+	&dev_attr_disabled_info_keys.attr,
 	NULL,
 };
 

@@ -70,6 +70,18 @@
 #define MAX_AUX_CODECS	2
 //#define CX2092X_MONITOR
 
+#if defined(CONFIG_SND_SOC_TAS2559)
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+#define USE_TAS2559_SND_SOC
+#endif
+#endif // defined(CONFIG_SND_SOC_TAS2559)
+
+// wsshim 20180116
+#if defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+#define USE_SPEKAER_ENABLE_GPIO
+#define USE_HP_JACK_DETECT
+#endif
+
 enum btsco_rates {
 	RATE_8KHZ_ID,
 	RATE_16KHZ_ID,
@@ -79,14 +91,22 @@ static int msm_btsco_rate = BTSCO_RATE_8KHZ;
 static int msm_btsco_ch = 1;
 
 static int msm_mi2s_tx_ch = 2;
-#if (defined(CONFIG_TARGET_PRODUCT_IF_S300N) && defined(CONFIG_SND_SOC_TAS2559))
+#if defined(USE_TAS2559_SND_SOC)
 static int msm_pri_mi2s_rx_ch = 1;
+#elif defined(CONFIG_SND_SOC_REALTEK)
+#if defined(CONFIG_SND_SOC_RT5640)
+static int msm_pri_mi2s_rx_ch = 2;
+#endif
 #else
 static int msm_pri_mi2s_rx_ch = 2;
 #endif
 static int pri_rx_sample_rate = SAMPLING_RATE_48KHZ;
-#if (defined(CONFIG_TARGET_PRODUCT_IF_S300N) && defined(CONFIG_SND_SOC_TAS2559))
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
 static int mi2s_tx_sample_rate = SAMPLING_RATE_16KHZ; //wjhyun 20170605 
+#elif defined(CONFIG_SND_SOC_REALTEK)
+#if defined(CONFIG_SND_SOC_RT5640)
+static int mi2s_tx_sample_rate = SAMPLING_RATE_16KHZ;
+#endif
 #else
 static int mi2s_tx_sample_rate = SAMPLING_RATE_48KHZ; 
 #endif
@@ -106,9 +126,19 @@ static int conf_int_codec_mux(struct msm8916_asoc_mach_data *pdata);
 
 static void *def_tasha_mbhc_cal(void);
 
-#if (defined(CONFIG_TARGET_PRODUCT_IF_S300N) && defined(CONFIG_SND_SOC_TAS2559))
+#if defined(USE_TAS2559_SND_SOC)
 extern int tas2559_cdc_mclk_enable(struct snd_soc_codec *codec, int enable,
                                  bool dapm);
+#endif
+
+#if defined(CONFIG_SND_SOC_REALTEK)
+#if defined(CONFIG_SND_SOC_RT5640)
+extern int rt5640_cdc_mclk_enable(struct snd_soc_codec *codec, int enable, bool dapm);
+#endif
+#endif
+
+#if defined(USE_HP_JACK_DETECT)
+static int use_headjack_detect = 0;
 #endif
 
 #if 1//wjhyun TODO : add tas5766 codec
@@ -117,6 +147,13 @@ extern void set_tasxxx_amp_type(int type);
 
 #ifdef CX2092X_MONITOR
 extern void mic_monitor_on_off(struct snd_soc_codec *codec, bool on_off);
+#endif
+
+#if 1//wjhyun TODO : NTP8824 define
+extern void ntpAMP_init(void);
+extern void amp_reset_low(void);
+//wjhyun 20171024
+extern void amp_mute_ctl(bool mute_on);
 #endif
 
 /*
@@ -295,7 +332,7 @@ static struct afe_clk_set mi2s_tx_clk = {
 
 static struct afe_clk_set mi2s_rx_clk = {
 	AFE_API_VERSION_I2S_CONFIG,
-	Q6AFE_LPASS_CLK_ID_PRI_MI2S_IBIT,
+	Q6AFE_LPASS_CLK_ID_PRI_MI2S_IBIT,	
 	Q6AFE_LPASS_IBIT_CLK_1_P536_MHZ,
 	Q6AFE_LPASS_CLK_ATTRIBUTE_COUPLE_NO,
 	Q6AFE_LPASS_CLK_ROOT_DEFAULT,
@@ -321,21 +358,46 @@ struct ext_cdc_tlmm_pinctrl_info ext_cdc_pinctrl_info;
 
 static int mi2s_rx_bit_format = SNDRV_PCM_FORMAT_S16_LE;
 static int bits_per_sample = 16;
-#if (defined(CONFIG_TARGET_PRODUCT_IF_S300N) && defined(CONFIG_SND_SOC_TAS2559))
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
 static int tx_bits_per_sample = 32; //wjhyun 20170605 
 #endif
 
 
-#if 1 // hjkoh
+#if defined(CONFIG_SND_SOC_TAS2559)
 static inline bool is_tas_snd_card(struct snd_soc_card *card)
 {
 	if(strcmp(card->name, "msm8x09-tas2559-snd-card") == 0 ||
-		strcmp(card->name, "msm8x09-tas5766-snd-card") == 0)
+		strcmp(card->name, "msm8x09-tas5766-snd-card") == 0 ||
+		strcmp(card->name, "msm8x09-ntp8824-snd-card") == 0)
 		return true;
 	return false;
 
 }
 #endif
+
+#if defined(CONFIG_SND_SOC_TAS2559)
+static inline bool is_ntp_snd_card(struct snd_soc_card *card)
+{
+	if(	strcmp(card->name, "msm8x09-ntp8824-snd-card") == 0)
+		return true;
+	return false;
+
+}
+#endif
+
+#if defined(CONFIG_SND_SOC_REALTEK)
+#if defined(CONFIG_SND_SOC_RT5640)
+static inline bool is_rt5640_snd_card(struct snd_soc_card *card)
+{
+    pr_info("[%s] Card Name: %s\n", __func__, card->name);
+    if( strcmp(card->name, "msm8x09-rt5640-snd-card") == 0)
+        return true;
+    return false;
+}
+#endif
+#endif
+
+
 
 struct msm8909_auxcodec_prefix_map {
 	char codec_name[50];
@@ -479,7 +541,7 @@ static int msm8x16_get_clk_id(int port_id)
 		return Q6AFE_LPASS_CLK_ID_TER_MI2S_IBIT;
 	case AFE_PORT_ID_QUATERNARY_MI2S_RX:
 	case AFE_PORT_ID_QUATERNARY_MI2S_TX:
-#if (defined(CONFIG_TARGET_PRODUCT_IF_S300N) && defined(CONFIG_SND_SOC_TAS2559)) 
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
 		return Q6AFE_LPASS_CLK_ID_QUAD_MI2S_EBIT;
 #else		
 		return Q6AFE_LPASS_CLK_ID_QUAD_MI2S_IBIT;
@@ -959,7 +1021,7 @@ static int msm_mi2s_tx_ch_put(struct snd_kcontrol *kcontrol,
 static int msm_mi2s_snd_hw_params(struct snd_pcm_substream *substream,
 			     struct snd_pcm_hw_params *params)
 {
-	pr_debug("%s(): substream = %s  stream = %d\n", __func__,
+	pr_info("[%s]: substream = %s  stream = %d\n", __func__,
 		 substream->name, substream->stream);
 	param_set_mask(params, SNDRV_PCM_HW_PARAM_FORMAT, mi2s_rx_bit_format);
 	return 0;
@@ -976,12 +1038,149 @@ static uint32_t get_mi2s_rx_clk_val(void)
 
 static uint32_t get_mi2s_tx_clk_val(void)
 {
-#if (defined(CONFIG_TARGET_PRODUCT_IF_S300N) && defined(CONFIG_SND_SOC_TAS2559))
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
 	return mi2s_tx_sample_rate * tx_bits_per_sample * 2; //wjhyun 20170605 TODO : model define
 #else
 	return mi2s_tx_sample_rate * bits_per_sample * 2;
 #endif
 }
+
+#ifdef MI2S_CLOCK_ALWAYS_ON
+static int msm_q6_enable_mi2s_clocks(struct snd_pcm_substream *substream, bool enable)
+{
+	int ret = 0;
+    int port_id = 0;
+    struct snd_soc_pcm_runtime *rtd = substream->private_data;
+	union afe_port_config port_config;
+
+    port_id = msm8x16_get_port_id(rtd->dai_link->be_id);
+    if (port_id < 0) {
+        pr_err("%s: Invalid port_id\n", __func__);
+        return -EINVAL;
+    }
+
+	pr_info("[%s] port id: 0x%x, Stream: %s\n", __func__, port_id, substream->stream?"CAPTURE":"PLAYBACK");
+
+	if (enable) 
+	{
+		ret = msm_gpioset_activate(CLIENT_WCD_EXT, "pri_i2s");
+		if (ret < 0) {
+            pr_err("%s: failed to activate the Pri_mi2s gpio's state\n",
+                __func__);
+            return ret;
+        }
+	
+		if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
+			switch(q6core_get_avs_version()) {
+			case (Q6_SUBSYS_AVS2_6):
+				mi2s_rx_clk_v1.clk_val1 = get_mi2s_rx_clk_val();
+                ret = afe_set_lpass_clock(port_id, &mi2s_rx_clk_v1);
+				break;
+			case (Q6_SUBSYS_AVS2_7):
+			case (Q6_SUBSYS_AVS2_8):
+				mi2s_rx_clk.enable = enable;
+                mi2s_rx_clk.clk_id = msm8x16_get_clk_id(port_id);
+                mi2s_rx_clk.clk_freq_in_hz = get_mi2s_rx_clk_val();
+                ret = afe_set_lpass_clock_v2(port_id, &mi2s_rx_clk);
+				break;
+			case (Q6_SUBSYS_INVALID):
+			default:
+				ret = -EINVAL;
+				pr_err("%s: INVALID AVS IMAGE\n", __func__);
+				break;
+			}
+
+			port_config.i2s.channel_mode = AFE_PORT_I2S_SD0;
+	        port_config.i2s.mono_stereo = MSM_AFE_CH_STEREO;
+    	    port_config.i2s.data_format = 0;
+    	    port_config.i2s.bit_width = 16;
+    	    port_config.i2s.reserved = 0;
+    	    port_config.i2s.i2s_cfg_minor_version = AFE_API_VERSION_I2S_CONFIG;
+    	    port_config.i2s.sample_rate = 48000;
+    	    port_config.i2s.ws_src = 1;
+        	ret = afe_port_start(AFE_PORT_ID_PRIMARY_MI2S_RX, &port_config, 48000);
+			if(IS_ERR_VALUE(ret)) {
+            	pr_info("%s: fail to open AFE port\n", __func__);
+            	return -EINVAL;
+        	}
+		}
+	}
+	else
+	{
+		ret = msm_gpioset_suspend(CLIENT_WCD_EXT, "pri_i2s");
+        if (ret < 0) {
+            pr_err("%s: gpio set cannot be de-activated %sd",
+                    __func__, "quin_i2s");
+            return ret;
+        }
+
+		if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {		
+			switch(q6core_get_avs_version()) {
+            case (Q6_SUBSYS_AVS2_6):
+                mi2s_rx_clk_v1.clk_val1 = Q6AFE_LPASS_IBIT_CLK_DISABLE;
+                ret = afe_set_lpass_clock(port_id, &mi2s_rx_clk_v1);
+				break;
+            case (Q6_SUBSYS_AVS2_7):
+            case (Q6_SUBSYS_AVS2_8):
+                mi2s_rx_clk.enable = enable;
+                mi2s_rx_clk.clk_id = msm8x16_get_clk_id(port_id);
+                mi2s_rx_clk.clk_freq_in_hz = 0;
+                ret = afe_set_lpass_clock_v2(port_id, &mi2s_rx_clk);
+				break;
+            case (Q6_SUBSYS_INVALID):
+            default:
+                ret = -EINVAL;
+                pr_err("%s: INVALID AVS IMAGE\n", __func__);
+                break;
+            }
+
+			ret = afe_close(AFE_PORT_ID_PRIMARY_MI2S_RX);
+			if (IS_ERR_VALUE(ret)) {
+				printk(KERN_ERR"fail to close AFE port\n");
+				return -EINVAL;
+			}
+		}
+	}
+
+	return ret;
+}
+
+static bool mi2s_started = false;
+
+bool is_mi2s_enable(void)
+{
+    return mi2s_started;
+}
+EXPORT_SYMBOL(is_mi2s_enable);
+
+void set_mi2s_enable(bool enable)
+{
+    mi2s_started = enable;
+}
+EXPORT_SYMBOL(set_mi2s_enable);
+
+int set_mi2s_force_disable(void)
+{
+	int ret = 0;
+
+	mi2s_started = false;	
+
+	ret = msm_gpioset_suspend(CLIENT_WCD_EXT, "pri_i2s");
+    if (ret < 0) {
+    	pr_err("%s: gpio set cannot be de-activated %sd",
+                    __func__, "quin_i2s");
+        return ret;
+    }
+
+	ret = afe_close(AFE_PORT_ID_PRIMARY_MI2S_RX);
+    if (IS_ERR_VALUE(ret)) {
+    	printk(KERN_ERR"fail to close AFE port\n");
+    	return -EINVAL;
+    }
+	return ret;
+}
+EXPORT_SYMBOL(set_mi2s_force_disable);
+#endif
 
 static int ext_mi2s_clk_ctl(struct snd_pcm_substream *substream, bool enable)
 {
@@ -999,6 +1198,7 @@ static int ext_mi2s_clk_ctl(struct snd_pcm_substream *substream, bool enable)
 		if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
 			switch (q6core_get_avs_version()) {
 			case (Q6_SUBSYS_AVS2_6):
+				pr_info("[%s] Q6_SUBSYS_AVS2_6\n", __func__);
 				mi2s_rx_clk_v1.clk_val1 = get_mi2s_rx_clk_val();
 				ret = afe_set_lpass_clock(
 						port_id,
@@ -1006,6 +1206,7 @@ static int ext_mi2s_clk_ctl(struct snd_pcm_substream *substream, bool enable)
 				break;
 			case (Q6_SUBSYS_AVS2_7):
 			case (Q6_SUBSYS_AVS2_8):
+				pr_info("[%s] Q6_SUBSYS_AVS2_7\n", __func__);
 				mi2s_rx_clk.enable = enable;
 				mi2s_rx_clk.clk_id =
 					msm8x16_get_clk_id(port_id);
@@ -1197,10 +1398,15 @@ static int msm8x16_enable_codec_ext_clk(struct snd_soc_codec *codec,
 static int msm8x16_enable_extcodec_ext_clk(struct snd_soc_codec *codec,
 					int enable,	bool dapm)
 {
-#if (defined(CONFIG_TARGET_PRODUCT_IF_S300N) && defined(CONFIG_SND_SOC_TAS2559))
+#if defined(USE_TAS2559_SND_SOC)
 	int ret;
 	ret = tas2559_cdc_mclk_enable(codec, enable, dapm);
 	pr_debug("%s: tas2559_cdc_mclk_enable() ret %d", __func__, ret);
+#elif defined(CONFIG_SND_SOC_REALTEK)
+#if defined(CONFIG_SND_SOC_RT5640)
+	int ret;
+    ret = rt5640_cdc_mclk_enable(codec, enable, dapm);
+#endif /* CONFIG_SND_SOC_RT5640  */
 #else
 	tasha_cdc_mclk_enable(codec, enable, dapm);
 #endif
@@ -1306,19 +1512,23 @@ static int msm8x16_mclk_event(struct snd_soc_dapm_widget *w,
 
 static void msm_mi2s_snd_shutdown(struct snd_pcm_substream *substream)
 {
+	#ifndef MI2S_CLOCK_ALWAYS_ON	
 	int ret;
+	#endif
 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
 	struct snd_soc_card *card = rtd->card;
 	struct msm8916_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
 
-	pr_debug("%s(): substream = %s  stream = %d\n", __func__,
+	pr_info("[%s]: substream = %s  stream = %d\n", __func__,
 		 substream->name, substream->stream);
 
 	if (!pdata->codec_type) {
+		#ifndef MI2S_CLOCK_ALWAYS_ON
 		ret = ext_mi2s_clk_ctl(substream, false);
 		if (ret < 0)
 			pr_err("%s:clock disable failed; ret=%d\n", __func__,
 					ret);
+		#endif
 		if (atomic_read(&pdata->mclk_rsc_ref) > 0) {
 			atomic_dec(&pdata->mclk_rsc_ref);
 			pr_debug("%s: decrementing mclk_res_ref %d\n",
@@ -1326,15 +1536,43 @@ static void msm_mi2s_snd_shutdown(struct snd_pcm_substream *substream)
 					atomic_read(&pdata->mclk_rsc_ref));
 		}
 	} else {
+		
+		#if defined(CONFIG_SND_SOC_TAS2559)
+		//wjhyun 20171024
+		if(is_ntp_snd_card(card))
+		{
+			amp_mute_ctl(true);
+		}
+		#endif /* CONFIG_SND_SOC_TAS2559  */ 
+
+		#ifndef MI2S_CLOCK_ALWAYS_ON	
 		ret = msm_gpioset_suspend(CLIENT_WCD_EXT, "pri_i2s");
 		if (ret < 0) {
 			pr_err("%s: gpio set cannot be de-activated %sd",
 					__func__, "quin_i2s");
 			return;
 		}
-		ret = ext_mi2s_clk_ctl(substream, false);
-		if (ret < 0)
-			pr_err("%s: failed to enable sclk\n", __func__);
+
+		#if defined(CONFIG_SND_SOC_TAS2559)
+		//wjhyun 20171024, pop noise 
+		//if(is_ntp_snd_card(card))
+		// wsshim 20180117 support PCB-0.3
+		if(is_tas_snd_card(card))
+		#elif defined(CONFIG_SND_SOC_REALTEK)
+		#if defined(CONFIG_SND_SOC_RT5640)
+		if(is_rt5640_snd_card(card))	
+		#endif /* CONFIG_SND_SOC_RT5640 */
+		#endif
+		{
+			pr_debug("%s: skip bit clock disable\n",__func__);
+		}
+		else
+		{
+			ret = ext_mi2s_clk_ctl(substream, false);
+			if (ret < 0)
+				pr_err("%s: failed to enable sclk\n", __func__);
+		}
+		#endif
 	}
 }
 
@@ -1520,7 +1758,7 @@ static int conf_int_codec_mux_quat(struct msm8916_asoc_mach_data *pdata)
 	vaddr = pdata->vaddr_gpio_mux_mic_ctl;
 	val = ioread32(vaddr);
 	/* enable QUAT MI2S interface to TLMM GPIO */
-#if (defined(CONFIG_TARGET_PRODUCT_IF_S300N) && defined(CONFIG_SND_SOC_TAS2559)) 
+#if defined(USE_TAS2559_SND_SOC)
 	val = 0x00420000;
 #else
 	val = val | 0x02020002;
@@ -1541,7 +1779,13 @@ static int msm_quat_mi2s_snd_startup(struct snd_pcm_substream *substream)
 	int ret = 0;
 	int val = 0;
 	void __iomem *vaddr = NULL;
+	#if defined(CONFIG_SND_SOC_TAS2559)
 	bool is_tas_card = is_tas_snd_card(card);
+	#elif defined(CONFIG_SND_SOC_REALTEK)
+	#if defined(CONFIG_SND_SOC_RT5640)
+	bool is_rt5640_card = is_rt5640_snd_card(card);
+	#endif
+	#endif
 
 	pr_debug("%s(): substream = %s  stream = %d\n", __func__,
 				substream->name, substream->stream);
@@ -1572,7 +1816,13 @@ static int msm_quat_mi2s_snd_startup(struct snd_pcm_substream *substream)
 		}
 	} else {
 		pr_debug("%s: External codec \n", __func__);
+		#if defined(CONFIG_SND_SOC_TAS2559)
 		if(is_tas_card){
+		#elif defined(CONFIG_SND_SOC_REALTEK)
+		#if defined(CONFIG_SND_SOC_RT5640)
+		if(is_rt5640_card){	
+		#endif /* CONFIG_SND_SOC_RT5640  */
+		#endif
 			// MI2S I/O mux for slave configuration
 			vaddr = pdata->vaddr_gpio_mux_mic_ctl;
 			val = 0x00420000;
@@ -1616,8 +1866,14 @@ static int msm_quat_mi2s_snd_startup(struct snd_pcm_substream *substream)
 		} 
 	}
 	if (atomic_inc_return(&quat_mi2s_clk_ref) == 1) {
-		unsigned int fmt;		
+		unsigned int fmt;
+		#if defined(CONFIG_SND_SOC_TAS2559)	
 		if(is_tas_card) {
+		#elif defined(CONFIG_SND_SOC_REALTEK)
+		#if defined(CONFIG_SND_SOC_RT5640)
+		if(is_rt5640_card) {	
+		#endif /* CONFIG_SND_SOC_RT5640  */
+		#endif 
 			fmt = SND_SOC_DAIFMT_CBM_CFM | SND_SOC_DAIFMT_LEFT_J;
 		} else {
 			fmt = SND_SOC_DAIFMT_CBS_CFS;
@@ -1678,7 +1934,13 @@ static void msm_quat_mi2s_snd_shutdown(struct snd_pcm_substream *substream)
 					__func__, "quin_i2s");
 		}
 
+		#if defined(CONFIG_SND_SOC_TAS2559)
 		if(!is_tas_snd_card(card)){
+		#elif defined(CONFIG_SND_SOC_REALTEK)
+		#if defined(CONFIG_SND_SOC_RT5640)
+		if(!is_rt5640_snd_card(card)) {
+		#endif /* CONFIG_SND_SOC_RT5640 */
+		#endif	
 			ret = ext_mi2s_clk_ctl(substream, false);
 			if (ret < 0)
 				pr_err("%s: failed to disable sclk\n", __func__);
@@ -1716,6 +1978,10 @@ static int conf_int_codec_mux(struct msm8916_asoc_mach_data *pdata)
 	return ret;
 }
 
+#if defined(CONFIG_SND_SOC_TAS2559)
+static bool first_clock = false;
+#endif
+
 static int msm_mi2s_snd_startup(struct snd_pcm_substream *substream)
 {
 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
@@ -1727,8 +1993,9 @@ static int msm_mi2s_snd_startup(struct snd_pcm_substream *substream)
 	int val = 0;
 	void __iomem *vaddr = NULL;
 
-	pr_debug("%s(): substream = %s  stream = %d\n", __func__,
+	pr_info("[%s]: substream = %s  stream = %d\n", __func__,
 		 substream->name, substream->stream);
+
 
 	if (!pdata->codec_type) {
 		ret = conf_int_codec_mux(pdata);
@@ -1737,13 +2004,17 @@ static int msm_mi2s_snd_startup(struct snd_pcm_substream *substream)
 					__func__);
 			return ret;
 		}
+		#ifndef MI2S_CLOCK_ALWAYS_ON
 		ret = ext_mi2s_clk_ctl(substream, true);
+
 		if (ret < 0) {
 			pr_err("%s: failed to enable sclk %d\n",
 					__func__, ret);
 			return ret;
 		}
+		#endif
 		ret =  msm8x16_enable_codec_ext_clk(codec, 1, true);
+
 		if (ret < 0) {
 			pr_err("failed to enable mclk\n");
 			return ret;
@@ -1757,6 +2028,7 @@ static int msm_mi2s_snd_startup(struct snd_pcm_substream *substream)
 							__func__);
 			return -EINVAL;
 		}
+
 	} else {
 		/* configure Primary Mi2S interface SCLK, WS, Data 0
 		 * and Data 1 to TLMM GPIO,
@@ -1767,13 +2039,20 @@ static int msm_mi2s_snd_startup(struct snd_pcm_substream *substream)
 		val = val | 0x201C;
 		iowrite32(val, vaddr);
 
+		#if defined(CONFIG_SND_SOC_TAS2559)
 		if(!is_tas_snd_card(card)){
+		#elif defined(CONFIG_SND_SOC_REALTEK)
+        #if defined(CONFIG_SND_SOC_RT5640)
+		if(!is_rt5640_snd_card(card)){		
+		#endif /* ONFIG_SND_SOC_RT5640 */
+		#endif
 			vaddr = pdata->vaddr_gpio_mux_mic_ctl;
 			val = ioread32(vaddr);
 			val = val | 0x00000002;
 			iowrite32(val, vaddr);
 		}
 
+		#ifndef MI2S_CLOCK_ALWAYS_ON
 		ret = msm_gpioset_activate(CLIENT_WCD_EXT, "pri_i2s");
 		if (ret < 0) {
 			pr_err("%s: failed to activate the Pri_mi2s gpio's state\n",
@@ -1786,10 +2065,33 @@ static int msm_mi2s_snd_startup(struct snd_pcm_substream *substream)
 			pr_err("%s: failed to enable sclk\n", __func__);
 			return ret;
 		}
+		#else
+		if(!is_mi2s_enable()) {
+			set_mi2s_enable(true);
+			msm_q6_enable_mi2s_clocks(substream, true);	
+		}
+		#endif
 	}
+
+	
 	ret = snd_soc_dai_set_fmt(cpu_dai, SND_SOC_DAIFMT_CBS_CFS);
 	if (ret < 0)
 		pr_err("%s: set fmt cpu dai failed; ret=%d\n", __func__, ret);
+	#ifdef MI2S_CLOCK_ALWAYS_ON
+	ret = 0;
+	#endif
+
+#if defined(CONFIG_SND_SOC_TAS2559)
+	if(first_clock == false)
+	{
+		if(is_ntp_snd_card(card))
+			ntpAMP_init();
+		first_clock = true;
+	}
+	//wjhyun 20171024
+	if(is_ntp_snd_card(card))
+		amp_mute_ctl(false);
+#endif
 
 	return ret;
 }
@@ -1952,7 +2254,7 @@ static int msm_audrx_init_wcd(struct snd_soc_pcm_runtime *rtd)
 	return ret;
 }
 
-#if 1 // hjkoh
+#if defined(CONFIG_SND_SOC_TAS2559)
 static int msm_audrx_init_tas2559(struct snd_soc_pcm_runtime *rtd)
 {
 
@@ -1979,7 +2281,100 @@ static int msm_audrx_init_tas2559(struct snd_soc_pcm_runtime *rtd)
 
 	return ret;
 }
+#endif /* ONFIG_SND_SOC_TAS2559 */
+
+
+#if defined(CONFIG_SND_SOC_REALTEK)
+#if defined(CONFIG_SND_SOC_RT5640)
+static struct snd_soc_jack rt5640_hp_jack;
+static struct snd_soc_jack_pin rt5640_hp_jack_pins[] = {
+    {
+        .pin = "Headphone Jack",
+        .mask = SND_JACK_HEADPHONE,
+    },
+};
+
+static struct snd_soc_jack_gpio rt5640_hp_jack_gpio = {
+    .name = "headphone detect",
+    .report = SND_JACK_HEADPHONE,
+    .debounce_time = 150,
+    .invert = 0,
+};
+
+
+static int rt5640_event_hp(struct snd_soc_dapm_widget *w,
+                    struct snd_kcontrol *k, int event)
+{
+	pr_info("[%s] Event: 0x%02x\n", __func__, event);
+	switch(event) {
+    case SND_SOC_DAPM_POST_PMU:
+        break;
+    case SND_SOC_DAPM_PRE_PMD:
+        break;
+    }
+	
+    return 0;
+}
+
+
+static const struct snd_soc_dapm_widget rt5640_dapm_widgets[] = {
+	SND_SOC_DAPM_SUPPLY_S("MCLK", -1, SND_SOC_NOPM, 0, 0,
+    	msm8x16_mclk_event, SND_SOC_DAPM_PRE_PMU | SND_SOC_DAPM_POST_PMD),
+};
+
+static const struct snd_soc_dapm_widget rt5640_dapm_jack_detect_widgets[] = {
+	SND_SOC_DAPM_HP("Headphone Jack", rt5640_event_hp),
+};
+
+static int msm_audrx_init_rt5640(struct snd_soc_pcm_runtime *rtd)
+{
+
+    struct snd_soc_codec *codec = rtd->codec;
+    struct snd_soc_dapm_context *dapm = &codec->dapm;
+    struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
+	struct snd_soc_card *card = rtd->card;
+	struct msm8916_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
+    int ret = 0;
+
+    pr_debug("%s: dev_name%s\n", __func__, dev_name(cpu_dai->dev));
+
+	snd_soc_dapm_new_controls(dapm, rt5640_dapm_widgets,
+                ARRAY_SIZE(rt5640_dapm_widgets));
+
+	#if defined(USE_HP_JACK_DETECT)	
+	if(use_headjack_detect) {
+		snd_soc_dapm_new_controls(dapm, rt5640_dapm_jack_detect_widgets,
+                	ARRAY_SIZE(rt5640_dapm_jack_detect_widgets));
+	}
+	#endif
+
+	if (!gpio_is_valid(pdata->us_euro_gpio)) {
+		pr_info("[%s] Invalied gpio: %d\n", __func__, pdata->us_euro_gpio);
+		return -EINVAL;
+	}
+
+	#if defined(USE_HP_JACK_DETECT)
+	if(use_headjack_detect) 
+	{
+		rt5640_hp_jack_gpio.gpio = pdata->us_euro_gpio;
+
+		snd_soc_jack_new(codec, "Headphone Jack", SND_JACK_HEADPHONE,
+    	            &rt5640_hp_jack);
+		snd_soc_jack_add_pins(&rt5640_hp_jack,
+    	                ARRAY_SIZE(rt5640_hp_jack_pins),
+   		                rt5640_hp_jack_pins);
+		snd_soc_jack_add_gpios(&rt5640_hp_jack,
+                    1,
+                    &rt5640_hp_jack_gpio);
+        
+        snd_soc_dapm_sync(dapm);
+	}
+	#endif
+    return ret;
+}
 #endif
+#endif
+
 
 static struct snd_soc_ops msm8x16_quat_mi2s_be_ops = {
 	.startup = msm_quat_mi2s_snd_startup,
@@ -2061,7 +2456,7 @@ static struct snd_soc_dai_link msm8x16_9326_dai[] = {
 	},
 };
 
-#if (defined(CONFIG_TARGET_PRODUCT_IF_S300N) && defined(CONFIG_SND_SOC_TAS2559))
+#if defined(USE_TAS2559_SND_SOC)
 static struct snd_soc_dai_link msm8x16_tas2559_dai[] = {
 	{
 		.name = LPASS_BE_PRI_MI2S_RX,
@@ -2110,6 +2505,43 @@ static struct snd_soc_dai_link msm8x16_cx2092x_dai[] = {
 		.ignore_suspend = 1,
 	},
 };
+#endif
+
+#if defined(CONFIG_SND_SOC_REALTEK)
+#if defined(CONFIG_SND_SOC_RT5640)
+static struct snd_soc_dai_link msm8x16_rt5640_dai[] = {
+    {
+        .name = LPASS_BE_PRI_MI2S_RX,
+        .stream_name = "Primary MI2S Playback",
+        .cpu_dai_name = "msm-dai-q6-mi2s.0",
+        .platform_name = "msm-pcm-routing",
+        .codec_name     = "rt5640-codec.1", // wsshim : add RT5640 Codec
+        .codec_dai_name = "rt5640-aif1", // wsshim : add RT5640 Codec
+        .no_pcm = 1,
+        .be_id = MSM_BACKEND_DAI_PRI_MI2S_RX,
+        .init = &msm_audrx_init_rt5640,
+        .be_hw_params_fixup = msm_pri_rx_be_hw_params_fixup,
+		.ops = &msm8x16_mi2s_be_ops,
+        .ignore_suspend = 1,
+    },
+};
+
+static struct snd_soc_dai_link msm8x16_cx2092x_dai[] = {
+    {
+        .name = LPASS_BE_QUAT_MI2S_TX,
+        .stream_name = "Quaternary MI2S Capture",
+        .cpu_dai_name = "msm-dai-q6-mi2s.3",
+        .platform_name = "msm-pcm-routing",
+        .codec_name = "cx2092x-codec.1",
+        .codec_dai_name = "cx2092x-aif",
+        .no_pcm = 1,
+        .be_id = MSM_BACKEND_DAI_QUATERNARY_MI2S_TX,
+        .be_hw_params_fixup = msm_tx_be_hw_params_fixup,
+        .ops = &msm8x16_quat_mi2s_be_ops,
+        .ignore_suspend = 1,
+    },
+};
+#endif
 #endif
 
 static struct snd_soc_aux_dev msm8909_aux_dev[] = {
@@ -2655,6 +3087,23 @@ static struct snd_soc_dai_link msm8x16_dai[] = {
 		.codec_name = "snd-soc-dummy",
 		.be_id = MSM_FRONTEND_DAI_VOICEMMODE2,
 	},
+#if defined(CONFIG_TARGET_PRODUCT_IF_S300N) || defined(CONFIG_TARGET_PRODUCT_IF_S600N) || defined(CONFIG_TARGET_PRODUCT_IF_S600NL)
+	{/* hw:x,29 */
+		.name = "MSM8X16 Media8",
+		.stream_name = "MultiMedia8",
+		.cpu_dai_name   = "MultiMedia8",
+		.platform_name  = "msm-pcm-dsp.0",
+		.dynamic = 1,
+		.codec_dai_name = "snd-soc-dummy-dai",
+		.codec_name = "snd-soc-dummy",
+		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
+			SND_SOC_DPCM_TRIGGER_POST},
+		.ignore_suspend = 1,
+		/* this dainlink has playback support */
+		.ignore_pmdown_time = 1,
+		.be_id = MSM_FRONTEND_DAI_MULTIMEDIA8,
+	},
+#endif
 	/* Primary AUX PCM Backend DAI Links */
 	{
 		.name = LPASS_BE_AUXPCM_RX,
@@ -2824,17 +3273,28 @@ static struct snd_soc_dai_link msm8x16_9326_dai_links[
 				ARRAY_SIZE(msm8x16_dai) +
 				ARRAY_SIZE(msm8x16_9326_dai)];
 
-#if 1 // hjkoh
+#if defined(CONFIG_SND_SOC_TAS2559)
 static struct snd_soc_dai_link msm8x16_tas2559_dai_links[
 				ARRAY_SIZE(msm8x16_dai) +
 				ARRAY_SIZE(msm8x16_tas2559_dai) +
 				ARRAY_SIZE(msm8x16_cx2092x_dai)];
 #endif
 
+#if defined(CONFIG_SND_SOC_TAS2559)
 static struct snd_soc_dai_link msm8x16_tas5766_dai_links[
 				ARRAY_SIZE(msm8x16_dai) +
 				ARRAY_SIZE(msm8x16_tas5766_dai) +
 				ARRAY_SIZE(msm8x16_cx2092x_dai)];
+#endif
+
+#if defined(CONFIG_SND_SOC_REALTEK)
+#if defined(CONFIG_SND_SOC_RT5640)
+static struct snd_soc_dai_link msm8x16_rt5640_dai_links[
+                ARRAY_SIZE(msm8x16_dai) +
+                ARRAY_SIZE(msm8x16_rt5640_dai) +
+                ARRAY_SIZE(msm8x16_cx2092x_dai)];
+#endif
+#endif
 
 struct snd_soc_card snd_soc_card_msm8916 = {
 	.name		= "msm8x16-snd-card",
@@ -2868,18 +3328,32 @@ static struct snd_soc_card bear_cards[MAX_SND_CARDS] = {
 		.dai_link	= msm8x16_9326_dai_links,
 		.num_links	= ARRAY_SIZE(msm8x16_9326_dai_links),
 	},
-#if 1 // hjkoh
+#if defined(CONFIG_SND_SOC_TAS2559)
 	{
 		.name		= "msm8x16-tas2559-snd-card",
 		.dai_link	= msm8x16_tas2559_dai_links,
 		.num_links	= ARRAY_SIZE(msm8x16_tas2559_dai_links),
 	},
-#endif
 	{
 		.name		= "msm8x16-tas5766-snd-card",
 		.dai_link	= msm8x16_tas5766_dai_links,
 		.num_links	= ARRAY_SIZE(msm8x16_tas5766_dai_links),
 	},
+#endif
+#if defined(CONFIG_SND_SOC_REALTEK)
+#if defined(CONFIG_SND_SOC_RT5640)
+	{
+        .name       = "msm8x16-rt5640-snd-card",
+        .dai_link   = msm8x16_rt5640_dai_links,
+        .num_links  = ARRAY_SIZE(msm8x16_rt5640_dai_links),
+    },
+	{
+        .name       = "msm8x16-rt5640-snd-card",
+        .dai_link   = msm8x16_rt5640_dai_links,
+        .num_links  = ARRAY_SIZE(msm8x16_rt5640_dai_links),
+    },
+#endif
+#endif
 };
 
 void disable_mclk(struct work_struct *work)
@@ -2959,6 +3433,11 @@ static int msm8x16_setup_hs_jack(struct platform_device *pdev,
 			struct msm8916_asoc_mach_data *pdata)
 {
 	struct pinctrl *pinctrl;
+	#if defined(USE_HP_JACK_DETECT)
+	struct pinctrl_state *set_state;
+	const char *headjack_detect = "qcom,msm-headjack-detect";
+	int ret = 0;
+	#endif
 
 	pdata->us_euro_gpio = of_get_named_gpio(pdev->dev.of_node,
 					"qcom,cdc-us-euro-gpios", 0);
@@ -2969,16 +3448,29 @@ static int msm8x16_setup_hs_jack(struct platform_device *pdev,
 			pdata->us_euro_gpio);
 	} else {
 		mbhc_cfg.swap_gnd_mic = msm8x16_swap_gnd_mic;
-		if (!gpio_is_valid(pdata->us_euro_gpio)) {
-			pr_err("%s: Invalid gpio: %d", __func__,
-						pdata->us_euro_gpio);
+        if (!gpio_is_valid(pdata->us_euro_gpio)) {
+            pr_err("%s: Invalid gpio: %d", __func__,
+                        pdata->us_euro_gpio);
+            return -EINVAL;
+        }
+        pinctrl = devm_pinctrl_get(&pdev->dev);
+        if (IS_ERR(pinctrl)) {
+            pr_err("%s: Unable to get pinctrl handle\n", __func__);
+            return -EINVAL;
+        }
+		#if defined(USE_HP_JACK_DETECT)
+		set_state = pinctrl_lookup_state(pinctrl, "us_eu_gpio_act");
+		if (IS_ERR(set_state)) {
+			pr_info("[%s] cannot get hs_jack pinctrl active state\n", __func__);
 			return -EINVAL;
 		}
-		pinctrl = devm_pinctrl_get(&pdev->dev);
-		if (IS_ERR(pinctrl)) {
-			pr_err("%s: Unable to get pinctrl handle\n", __func__);
-			return -EINVAL;
+		ret = of_property_read_u32(pdev->dev.of_node, headjack_detect, &use_headjack_detect);			
+		if(ret) {
+			pr_info("[%s] missing %s in dt node\n", __func__, headjack_detect);	
 		}
+		pr_info("[%s] headjack detect: %d\n", __func__, use_headjack_detect);
+	
+		#else
 		pinctrl_info.pinctrl = pinctrl;
 		/* get pinctrl handle for cross det pin*/
 		pinctrl_info.cross_conn_det_sus = pinctrl_lookup_state(pinctrl,
@@ -2995,6 +3487,7 @@ static int msm8x16_setup_hs_jack(struct platform_device *pdev,
 								 __func__);
 			return -EINVAL;
 		}
+		#endif
 	}
 	return 0;
 }
@@ -3019,7 +3512,7 @@ static void msm8x16_dt_parse_cap_info(struct platform_device *pdev,
 int get_cdc_gpio_lines(struct pinctrl *pinctrl, int ext_pa)
 {
 	int ret;
-	pr_debug("%s\n", __func__);
+
 	switch (ext_pa) {
 	case SEC_MI2S_ID:
 		pinctrl_info.cdc_lines_sus = pinctrl_lookup_state(pinctrl,
@@ -3106,13 +3599,17 @@ static struct snd_soc_card *populate_ext_snd_card_dailinks(
 	int found = 0;
 	int num_links, i, ret;
 
-#if (defined(CONFIG_TARGET_PRODUCT_IF_S300N) && defined(CONFIG_SND_SOC_TAS2559))
+#if defined(USE_TAS2559_SND_SOC)
 	if (pdev->id == 1 || pdev->id == 2 || pdev->id == 3) {
+#elif defined(CONFIG_SND_SOC_REALTEK)
+#if defined(CONFIG_SND_SOC_RT5640)
+    if (pdev->id == 1 || pdev->id == 2 || pdev->id == 3) {
+#endif
 #else
 	if (pdev->id == 1) {
 #endif
 
-#if (defined(CONFIG_TARGET_PRODUCT_IF_S300N) && defined(CONFIG_SND_SOC_TAS2559))
+#if defined(USE_TAS2559_SND_SOC)
 		card = &bear_cards[pdev->id];
 		pr_info("%s: CARD is %s", __func__, card->name);
 		num_links = card->num_links;
@@ -3141,6 +3638,32 @@ static struct snd_soc_card *populate_ext_snd_card_dailinks(
 		}
 		
 		msm8909_dai_links = card->dai_link;
+#elif defined(CONFIG_SND_SOC_REALTEK)
+#if defined(CONFIG_SND_SOC_RT5640)
+        card = &bear_cards[pdev->id];
+        pr_info("[%s] CARD is %s", __func__, card->name);
+        num_links = card->num_links;
+
+        memcpy(card->dai_link, msm8x16_dai, sizeof(msm8x16_dai));
+
+		if (pdev->id == 1) 
+		{
+			// id 1 : WCD9335
+            memcpy(card->dai_link + ARRAY_SIZE(msm8x16_dai),
+                msm8x16_9326_dai, sizeof(msm8x16_9326_dai));	
+		}
+		else
+		{
+			// id 3 : RT5640
+	        pr_err("Sound card RT5640\n");
+	        memcpy(card->dai_link + ARRAY_SIZE(msm8x16_dai),
+	            msm8x16_rt5640_dai, sizeof(msm8x16_rt5640_dai));
+		    memcpy(card->dai_link + ARRAY_SIZE(msm8x16_dai) + ARRAY_SIZE(msm8x16_rt5640_dai),
+            msm8x16_cx2092x_dai, sizeof(msm8x16_cx2092x_dai));
+
+		}
+        msm8909_dai_links = card->dai_link;
+#endif
 #else
 		pr_debug("%s: CARD is 9326\n", __func__);
 
@@ -3358,7 +3881,11 @@ static int msm8x16_asoc_machine_probe(struct platform_device *pdev)
 	const char *hs_micbias_type = "qcom,msm-hs-micbias-type";
 	const char *ext_pa = "qcom,msm-ext-pa";
 	const char *mclk = "qcom,msm-mclk-freq";
+	
+	#ifndef USE_SPEKAER_ENABLE_GPIO
 	const char *spk_ext_pa = "qcom,msm-spk-ext-pa";
+	#endif
+	
 	const char *ptr = NULL;
 	const char *type = NULL;
 	const char *ext_pa_str = NULL;
@@ -3422,6 +3949,7 @@ static int msm8x16_asoc_machine_probe(struct platform_device *pdev)
 	pdata->mclk_freq = id;
 	dev_dbg(&pdev->dev, "mclk_freq:%d\n", pdata->mclk_freq);
 
+	#ifndef USE_SPEKAER_ENABLE_GPIO
 	pdata->spk_ext_pa_gpio = of_get_named_gpio(pdev->dev.of_node,
 				spk_ext_pa, 0);
 	if (pdata->spk_ext_pa_gpio < 0) {
@@ -3434,6 +3962,7 @@ static int msm8x16_asoc_machine_probe(struct platform_device *pdev)
 			return -EINVAL;
 		}
 	}
+	#endif
 
 	ret = of_property_read_string(pdev->dev.of_node, codec_type, &ptr);
 	if (ret) {
